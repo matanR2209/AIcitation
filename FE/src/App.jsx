@@ -8,6 +8,16 @@ import StatusBar from './components/StatusBar';
 import LoginModal from './components/LoginModal';
 
 function MobileBlock() {
+  const [copied, setCopied] = useState(false);
+  const url = window.location.href;
+
+  function copyLink() {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
   return (
     <div className="mobile-block">
       <div className="mobile-block-content">
@@ -20,9 +30,15 @@ function MobileBlock() {
           exclusively on desktop environments — where serious AI research happens.
         </p>
         <p className="mobile-footer">
-          Please access me through a desktop browser.<br />
+          Copy this link and open it on your desktop browser.<br />
           <em>Mobile support is not in my training data.</em>
         </p>
+        <div className="mobile-copy-row">
+          <span className="mobile-url">{url}</span>
+          <button className="mobile-copy-btn" onClick={copyLink}>
+            {copied ? '✓ Copied!' : 'Copy Link'}
+          </button>
+        </div>
       </div>
     </div>
   );
