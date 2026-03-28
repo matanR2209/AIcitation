@@ -30,11 +30,14 @@ export default function RunPanel() {
 
   async function sendPrompt(idx, engines) {
     const text = PROMPTS[idx];
+    const { auth } = useStore.getState();
     setRunState('running');
+    const body = { promptIdx: idx, promptText: text, engines };
+    if (auth.mode === 'keys' && auth.keys) body.keys = auth.keys;
     const res = await fetch('/api/run-prompt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ promptIdx: idx, promptText: text, engines }),
+      body: JSON.stringify(body),
     });
     const raw = await res.text();
     let data;

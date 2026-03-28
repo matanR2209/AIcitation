@@ -62,8 +62,10 @@ export const useStore = create((set, get) => ({
   runState: 'idle',   // 'idle' | 'running' | 'done' | 'error'
   currentAI: null,
   statusLog: [],
+  auth: { done: false, mode: null, keys: null },  // mode: 'magic' | 'keys'
 
   setActive: (idx) => set({ activeIdx: idx }),
+  setAuth: (auth) => set({ auth }),
 
   setResponse: (promptIdx, ai, text) => {
     const sources = detectSources(text);

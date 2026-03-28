@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
 const http    = require('http');
@@ -174,9 +175,18 @@ wss.on('connection', ws => {
 
 let activeRunner = null;
 
+// POST /api/auth — validates the magic password
+app.post('/api/auth', (req, res) => {
+  const { password } = req.body;
+  const magic = process.env.MAGIC_PASSWORD;
+  if (!magic) return res.status(500).json({ ok: false, error: 'MAGIC_PASSWORD not set in .env' });
+  if (password === magic) return res.json({ ok: true });
+  return res.status(401).json({ ok: false, error: 'Invalid password' });
+});
+
 // POST /api/run-prompt
 app.post('/api/run-prompt', (req, res) => {
-  const { promptIdx, promptText, engines } = req.body;
+  const { promptIdx, promptText, engines, keys } = req.body;
   if (promptIdx === undefined || !promptText) {
     return res.status(400).json({ ok: false, error: 'Missing promptIdx or promptText' });
   }
@@ -194,6 +204,13 @@ app.post('/api/run-prompt', (req, res) => {
 
   const envExtra = { PROMPT_IDX: String(promptIdx), PROMPT_TEXT: promptText };
   if (engineList) envExtra.ENGINES = engineList.join(',');
+  // Allow user-supplied API keys to override .env values
+  if (keys) {
+    if (keys.anthropic) envExtra.ANTHROPIC_API_KEY = keys.anthropic;
+    if (keys.gemini)    envExtra.GEMINI_API_KEY    = keys.gemini;
+    if (keys.tavily)    envExtra.TAVILY_API_KEY     = keys.tavily;
+    if (keys.github)    envExtra.GITHUB_TOKEN       = keys.github;
+  }
 
   const runner = spawn('node', [path.join(__dirname, 'runner.js')], {
     env:   { ...process.env, ...envExtra },
