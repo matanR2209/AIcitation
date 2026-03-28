@@ -1,0 +1,18 @@
+# Secrets — never commit
+BE/.env
+BE/.env.local
+
+# Dependencies
+node_modules/
+FE/node_modules/
+BE/node_modules/
+
+# Build output
+FE/dist/
+
+# Runtime logs
+BE/logs/
+
+# IDE
+.idea/
+*.iml
