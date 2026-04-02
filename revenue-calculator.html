@@ -127,6 +127,56 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color:
   .layout { grid-template-columns: 1fr; }
   .charts-panel { position: relative; height: auto; }
 }
+
+@media (max-width: 600px) {
+  /* Header */
+  .hdr { padding: 10px 14px; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .hdr-title { font-size: 1rem; }
+  .hdr-sub { font-size: .72rem; }
+
+  /* Scenario bar */
+  .sc-bar { padding: 8px 14px; gap: 6px; }
+  .sc-btn { padding: 5px 12px; font-size: .75rem; }
+  .reset-btn { margin-left: 0; font-size: .72rem; }
+
+  /* Layout */
+  .inputs-panel { padding: 12px 10px; }
+  .charts-panel { padding: 12px 10px 18px; }
+
+  /* Section cards */
+  .sec-head { padding: 10px 12px; gap: 8px; }
+  .sec-head .badge { width: 26px; height: 26px; font-size: .88rem; }
+  .sec-head .sec-label strong { font-size: .82rem; }
+  .sec-head .sec-label span   { font-size: .68rem; }
+  .sec-head .sec-total { font-size: .76rem; padding: 3px 8px; }
+  .sec-body { padding: 10px 12px 12px; }
+
+  /* Slider rows */
+  .srow-top .s-label { font-size: .78rem; }
+  .srow-top .s-val   { font-size: .9rem; min-width: 76px; }
+
+  /* Output pills — stack to 2 per row */
+  .outputs { gap: 6px; }
+  .out-pill { min-width: calc(50% - 3px); }
+  .out-pill .op-val { font-size: .88rem; }
+
+  /* Total box */
+  .total-box { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
+  .total-box .tb-left .tb-val { font-size: 1.9rem; }
+  .total-box .tb-right { width: 100%; }
+  .range-bar { width: 100%; }
+
+  /* Contribution rows */
+  .contrib-row .cr-label { width: 100px; font-size: .72rem; }
+  .contrib-row .cr-val   { width: 60px; font-size: .72rem; }
+
+  /* Synergy row */
+  .synergy-row { font-size: .74rem; line-height: 1.6; }
+
+  /* Margin calc */
+  .margin-calc { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .margin-calc .mc-val { font-size: .92rem; }
+}
 </style>
 </head>
 <body>
