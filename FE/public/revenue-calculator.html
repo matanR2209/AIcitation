@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SI Revenue Model — Interactive Growth Engine</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red:   #C0392B;
+  --navy:  #1C2C6B;
+  --amber: #B45309;
+  --teal:  #0D7377;
+  --dark:  #1A1A1A;
+  --bg:    #F0F2F5;
+  --white: #FFFFFF;
+  --a-light: #E8EDF8;
+  --b-light: #FEF3C7;
+  --c-light: #D1FAF8;
+}
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+
+/* ─── HEADER ──────────────────────────────────────────── */
+.hdr { background: var(--red); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.hdr-title { color: #fff; font-size: 1.25rem; font-weight: 800; }
+.hdr-sub   { color: rgba(255,255,255,.78); font-size: .78rem; }
+.sc-bar { background: var(--dark); padding: 8px 28px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sc-bar .lbl { color: #aaa; font-size: .75rem; font-weight: 600; letter-spacing: .5px; margin-right: 4px; }
+.sc-btn { padding: 5px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: .8rem; font-weight: 700; transition: all .15s; }
+.sc-btn.low    { background: #3B82F6; color: #fff; }
+.sc-btn.base   { background: var(--navy); color: #fff; }
+.sc-btn.high   { background: var(--teal); color: #fff; }
+.sc-btn.active { box-shadow: 0 0 0 3px #FFD700; }
+.reset-btn { margin-left: auto; padding: 5px 14px; background: transparent; border: 1px solid #555; border-radius: 4px; color: #aaa; cursor: pointer; font-size: .75rem; }
+.reset-btn:hover { border-color: #aaa; color: #fff; }
+
+/* ─── LAYOUT ──────────────────────────────────────────── */
+.layout { display: grid; grid-template-columns: 430px 1fr; min-height: calc(100vh - 88px); }
+.inputs-panel { padding: 18px 16px; overflow-y: auto; background: var(--bg); }
+.charts-panel { padding: 18px 20px 24px; background: #E8EAEF; position: sticky; top: 0; height: calc(100vh - 88px); overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+
+/* ─── SECTION CARDS ───────────────────────────────────── */
+.sec-card { background: var(--white); border-radius: 10px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+.sec-head { padding: 10px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.sec-head .badge { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; color: #fff; flex-shrink: 0; }
+.sec-head .sec-label { flex: 1; }
+.sec-head .sec-label strong { display: block; color: #fff; font-size: .88rem; font-weight: 700; }
+.sec-head .sec-label span   { color: rgba(255,255,255,.75); font-size: .72rem; }
+.sec-head .sec-total { background: rgba(0,0,0,.2); border-radius: 4px; padding: 3px 10px; color: #fff; font-size: .82rem; font-weight: 800; white-space: nowrap; }
+.sec-a .sec-head { background: var(--navy); }
+.sec-b .sec-head { background: var(--amber); }
+.sec-c .sec-head { background: var(--teal); }
+.sec-body { padding: 12px 16px 14px; }
+.chevron { color: rgba(255,255,255,.6); font-size: .8rem; transition: transform .2s; }
+.collapsed .chevron { transform: rotate(-90deg); }
+.collapsed .sec-body { display: none; }
+
+/* ─── SLIDER ROWS ─────────────────────────────────────── */
+.srow { margin-bottom: 14px; }
+.srow:last-child { margin-bottom: 0; }
+.srow-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+.srow-top .s-label { font-size: .82rem; color: #444; line-height: 1.3; }
+.srow-top .s-val { font-size: 1rem; font-weight: 800; color: var(--red); min-width: 90px; text-align: right; }
+.srow input[type=range] { width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px; background: #DDD; outline: none; cursor: pointer; margin-bottom: 2px; }
+.srow input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--red); cursor: pointer; box-shadow: 0 1px 5px rgba(0,0,0,.25); }
+.srow .s-range { display: flex; justify-content: space-between; font-size: .68rem; color: #999; }
+.disclaimer { font-size: .72rem; color: #888; font-style: italic; margin-top: 2px; padding: 3px 0 1px; line-height: 1.4; }
+
+/* ─── IMPLEMENTATION SELECT ───────────────────────────── */
+.impl-row { margin-bottom: 12px; }
+.impl-row label { font-size: .8rem; font-weight: 700; color: #444; display: block; margin-bottom: 5px; }
+.impl-select { width: 100%; padding: 7px 10px; border: 1.5px solid #CCC; border-radius: 6px; font-size: .85rem; font-family: inherit; background: #fff; cursor: pointer; color: var(--dark); }
+.impl-select:focus { outline: none; border-color: var(--teal); }
+.impl-desc { font-size: .74rem; color: #666; font-style: italic; padding: 6px 10px; background: var(--c-light); border-radius: 4px; margin-top: 5px; line-height: 1.4; }
+
+/* ─── COMPUTED MARGIN DISPLAY ─────────────────────────── */
+.margin-calc {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 5px;
+  padding: 7px 12px; margin: 10px 0 4px; font-size: .8rem; color: #166534;
+}
+.margin-calc .mc-label { font-weight: 600; }
+.margin-calc .mc-val   { font-size: 1rem; font-weight: 800; color: #15803D; }
+.margin-calc .mc-formula { font-size: .7rem; color: #6B9E7A; }
+
+/* ─── OUTPUT PILLS ────────────────────────────────────── */
+.outputs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #EEE; }
+.out-pill { flex: 1; min-width: 110px; background: #F8F8F8; border-radius: 6px; padding: 7px 10px; }
+.out-pill .op-lbl { font-size: .68rem; color: #888; text-transform: uppercase; letter-spacing: .4px; }
+.out-pill .op-val { font-size: .95rem; font-weight: 800; color: var(--dark); margin-top: 1px; }
+.sec-a .out-pill { background: var(--a-light); }
+.sec-a .out-pill .op-val { color: var(--navy); }
+.sec-b .out-pill { background: var(--b-light); }
+.sec-b .out-pill .op-val { color: var(--amber); }
+.sec-c .out-pill { background: var(--c-light); }
+.sec-c .out-pill .op-val { color: var(--teal); }
+
+/* ─── CONNECTOR ───────────────────────────────────────── */
+.connector { text-align: center; padding: 4px 0 2px; font-size: .75rem; color: #999; }
+.connector .arr { font-size: 1.1rem; color: var(--red); display: block; }
+
+/* ─── SUB-SECTION DIVIDER ─────────────────────────────── */
+.sub-divider { font-size: .74rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 10px; padding-top: 10px; border-top: 1px solid #EEE; }
+.sub-divider:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+
+/* ─── CHARTS PANEL ────────────────────────────────────── */
+.total-box { background: var(--dark); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.total-box .tb-left .tb-label { color: #aaa; font-size: .72rem; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; }
+.total-box .tb-left .tb-val { font-size: 2.4rem; font-weight: 900; color: #fff; line-height: 1.1; transition: color .3s; }
+.total-box .tb-right { text-align: right; }
+.total-box .tb-right .tb-sub { font-size: .72rem; color: #666; margin-bottom: 4px; }
+.range-bar { width: 160px; height: 10px; background: #333; border-radius: 5px; position: relative; overflow: hidden; }
+.range-bar .rb-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #3B82F6, var(--red)); transition: width .4s ease; }
+.chart-card { background: var(--white); border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+.chart-card h3 { font-size: .8rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.contrib-list { display: flex; flex-direction: column; gap: 6px; }
+.contrib-row { display: flex; align-items: center; gap: 8px; }
+.contrib-row .cr-label { font-size: .78rem; color: #555; width: 130px; flex-shrink: 0; }
+.contrib-row .cr-bar-wrap { flex: 1; background: #F0F0F0; border-radius: 3px; height: 14px; overflow: hidden; }
+.contrib-row .cr-bar { height: 100%; border-radius: 3px; transition: width .4s ease; }
+.contrib-row .cr-val { font-size: .78rem; font-weight: 700; width: 72px; text-align: right; }
+.synergy-row { background: #2D3748; border-radius: 8px; padding: 10px 14px; font-size: .78rem; color: #CBD5E0; text-align: center; line-height: 1.7; }
+.synergy-row strong { color: #FC8181; }
+
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+  .charts-panel { position: relative; height: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">SI Revenue Model &mdash; A → B → C Growth Engine</div>
+    <div class="hdr-sub">Move any slider to see instant revenue impact &nbsp;·&nbsp; Phase 2 · April 2026</div>
+  </div>
+</div>
+
+<div class="sc-bar">
+  <span class="lbl">SCENARIO:</span>
+  <button class="sc-btn low"       onclick="applyScenario('low')">Low</button>
+  <button class="sc-btn base active" onclick="applyScenario('base')">Base</button>
+  <button class="sc-btn high"      onclick="applyScenario('high')">High</button>
+  <button class="reset-btn"        onclick="applyScenario('base')">↺ Reset to Base</button>
+</div>
+
+<div class="layout">
+
+  <!-- ══ INPUTS PANEL ════════════════════════════════════ -->
+  <div class="inputs-panel">
+
+    <!-- SECTION A -->
+    <div class="sec-card sec-a" id="card-a">
+      <div class="sec-head" onclick="toggleCard('card-a')">
+        <div class="badge">A</div>
+        <div class="sec-label">
+          <strong>Distribution &amp; User Attraction</strong>
+          <span>AI Citation Engine — traffic from AI search</span>
+        </div>
+        <div class="sec-total" id="st-a">0 visitors</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="sec-body">
+
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">AI engine monthly impressions</span>
+            <span class="s-val" id="dv-impressions">400M</span>
+          </div>
+          <input type="range" id="s_impressions" min="10" max="1500" step="10" value="400"
+                 oninput="updateDisplay('impressions', this.value); calc()">
+          <div class="s-range"><span>10M</span><span>1,500M</span></div>
+          <div class="disclaimer">
+            Value in millions — 400 means 400,000,000 total views/mo across all AI engines (Claude, ChatGPT, Gemini, Perplexity…).
+            Estimated from the Section A citation tracker.
+          </div>
+        </div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">AI-to-site click-through rate</span>
+            <span class="s-val" id="dv-ctr">15.0 / 1k</span>
+          </div>
+          <input type="range" id="s_ctr" min="1" max="40" step="0.5" value="15"
+                 oninput="updateDisplay('ctr', this.value); calc()">
+          <div class="s-range"><span>1 / 1k</span><span>40 / 1k</span></div>
+          <div class="disclaimer">
+            Clicks per 1,000 AI impressions. &nbsp;<strong>Default: 15 = 1.5% CTR</strong> — per the Section A AI citation model benchmark.
+            Industry range: 0.5–3%.
+          </div>
+        </div>
+
+        <div class="outputs">
+          <div class="out-pill"><div class="op-lbl">New visitors / mo</div><div class="op-val" id="op-new-vis">—</div></div>
+          <div class="out-pill"><div class="op-lbl">New visitors / yr</div><div class="op-val" id="op-new-vis-yr">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector"><span class="arr">↓</span>A feeds B — new visitors enter the auth funnel</div>
+
+    <!-- SECTION B -->
+    <div class="sec-card sec-b" id="card-b">
+      <div class="sec-head" onclick="toggleCard('card-b')">
+        <div class="badge">B</div>
+        <div class="sec-label">
+          <strong>User Engagement &amp; Loyalty</strong>
+          <span>Auth Engine — converting visitors to owned audience</span>
+        </div>
+        <div class="sec-total" id="st-b">$0</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="sec-body">
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">Base monthly site visitors (organic)</span>
+            <span class="s-val" id="dv-base_visitors">29M</span>
+          </div>
+          <input type="range" id="s_base_visitors" min="1000000" max="60000000" step="500000" value="29000000"
+                 oninput="updateDisplay('base_visitors', this.value); calc()">
+          <div class="s-range"><span>1M</span><span>60M</span></div>
+        </div>
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">Auth conversion rate</span>
+            <span class="s-val" id="dv-auth_rate">7.5%</span>
+          </div>
+          <input type="range" id="s_auth_rate" min="0.5" max="30" step="0.5" value="7.5"
+                 oninput="updateDisplay('auth_rate', this.value); calc()">
+          <div class="s-range"><span>0.5%</span><span>30%</span></div>
+          <div class="disclaimer">% of all visitors who authenticate (create account / sign in). Model range: 5–10%.</div>
+        </div>
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">Avg visits per month per auth user</span>
+            <span class="s-val" id="dv-visits">4.0</span>
+          </div>
+          <input type="range" id="s_visits" min="1" max="20" step="0.5" value="4"
+                 oninput="updateDisplay('visits', this.value); calc()">
+          <div class="s-range"><span>1</span><span>20 / mo</span></div>
+        </div>
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">CPM uplift — auth vs. anonymous</span>
+            <span class="s-val" id="dv-cpm">$8.50</span>
+          </div>
+          <input type="range" id="s_cpm" min="1" max="25" step="0.5" value="8.5"
+                 oninput="updateDisplay('cpm', this.value); calc()">
+          <div class="s-range"><span>$1</span><span>$25 / 1k views</span></div>
+          <div class="disclaimer">Additional $ per 1,000 ad impressions from authenticated users. Model: $6–11 uplift (anon $2–4 → auth $8–15).</div>
+        </div>
+        <div class="outputs">
+          <div class="out-pill"><div class="op-lbl">Auth users</div><div class="op-val" id="op-auth-users">—</div></div>
+          <div class="out-pill"><div class="op-lbl">Auth CPM Rev / yr</div><div class="op-val" id="op-auth-rev">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector"><span class="arr">↓</span>B upgrades C — auth audience enables premium revenue</div>
+
+    <!-- SECTION C -->
+    <div class="sec-card sec-c" id="card-c">
+      <div class="sec-head" onclick="toggleCard('card-c')">
+        <!-- No badge per user request -->
+        <div class="sec-label">
+          <strong>Monetization — Capabilities</strong>
+          <span>AI Audio (ElevenLabs) + AI Visual (Magnifi / WSC Sports)</span>
+        </div>
+        <div class="sec-total" id="st-c">$0</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="sec-body">
+
+        <!-- CAP 1 -->
+        <div class="sub-divider">Capability 1 — AI Audio Personalization &nbsp;·&nbsp; Lead partner: ElevenLabs</div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">Gross revenue — AI Audio Personalization</span>
+            <span class="s-val" id="dv-c1_rev">$2.25M</span>
+          </div>
+          <input type="range" id="s_c1_rev" min="0" max="6000000" step="50000" value="2250000"
+                 oninput="updateDisplay('c1_rev', this.value); calc()">
+          <div class="s-range"><span>$0</span><span>$6M / yr</span></div>
+          <div class="disclaimer">CPM uplift + podcast ad revenue. Model range: $1.5–3M/yr.</div>
+        </div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">Implementation cost — API (ElevenLabs)</span>
+            <span class="s-val" id="dv-c1_cost">$35K</span>
+          </div>
+          <input type="range" id="s_c1_cost" min="0" max="500000" step="5000" value="35000"
+                 oninput="updateDisplay('c1_cost', this.value); calc()">
+          <div class="s-range"><span>$0</span><span>$500K / yr</span></div>
+          <div class="disclaimer">~$35K/yr API cost at SI's scale (ElevenLabs enterprise publisher tier).</div>
+        </div>
+
+        <div class="margin-calc">
+          <div>
+            <div class="mc-label">Computed Net Margin — Cap 1</div>
+            <div class="mc-formula">(Gross Revenue − API Cost) ÷ Gross Revenue</div>
+          </div>
+          <div class="mc-val" id="out-c1-margin">—</div>
+        </div>
+
+        <div class="outputs">
+          <div class="out-pill"><div class="op-lbl">▶ Net Revenue / yr</div><div class="op-val" id="op-c1-net">—</div></div>
+        </div>
+
+        <!-- CAP 2 -->
+        <div class="sub-divider">Capability 2 — AI Visual + Live Coverage</div>
+
+        <div class="impl-row">
+          <label>Implementation method:</label>
+          <select class="impl-select" id="c2_impl" onchange="setC2Impl(this.value)">
+            <option value="wsc">WSC Sports — external partnership</option>
+            <option value="magnifi">Magnifi — native (already in MM stack)</option>
+          </select>
+          <div class="impl-desc" id="c2_impl_desc">
+            WSC Sports partnership: AI highlights, IBM Watson-style live hub. Revenue potential $2–4M/yr but requires a licensing deal.
+          </div>
+        </div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">Gross revenue — AI Visual + Live Coverage</span>
+            <span class="s-val" id="dv-c2_rev">$3.0M</span>
+          </div>
+          <input type="range" id="s_c2_rev" min="500000" max="6000000" step="50000" value="3000000"
+                 oninput="updateDisplay('c2_rev', this.value); calc()">
+          <div class="s-range" id="c2_rev_range"><span>$500K</span><span>$6M / yr</span></div>
+          <div class="disclaimer" id="c2_rev_note">Video CPM uplift + session length lift from AI-generated highlights and live hub.</div>
+        </div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <span class="s-label">Implementation cost</span>
+            <span class="s-val" id="dv-c2_cost">$500K</span>
+          </div>
+          <input type="range" id="s_c2_cost" min="100000" max="2000000" step="25000" value="500000"
+                 oninput="updateDisplay('c2_cost', this.value); calc()">
+          <div class="s-range" id="c2_cost_range"><span>$100K</span><span>$2M / yr</span></div>
+          <div class="disclaimer" id="c2_cost_note">WSC Sports licensing + integration costs.</div>
+        </div>
+
+        <div class="margin-calc">
+          <div>
+            <div class="mc-label">Computed Net Margin — Cap 2</div>
+            <div class="mc-formula">(Gross Revenue − Implementation Cost) ÷ Gross Revenue</div>
+          </div>
+          <div class="mc-val" id="out-c2-margin">—</div>
+        </div>
+
+        <div class="outputs">
+          <div class="out-pill"><div class="op-lbl">▶ Net Revenue / yr</div><div class="op-val" id="op-c2-net">—</div></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /inputs-panel -->
+
+  <!-- ══ CHARTS PANEL ════════════════════════════════════ -->
+  <div class="charts-panel">
+
+    <div class="total-box">
+      <div class="tb-left">
+        <div class="tb-label">Total Year 1 Revenue</div>
+        <div class="tb-val" id="big-total">—</div>
+        <div style="color:#888;font-size:.7rem;margin-top:3px">Auth CPM + AI Audio + AI Visual</div>
+      </div>
+      <div class="tb-right">
+        <div class="tb-sub">vs. $4.2–8.4M target range</div>
+        <div class="range-bar"><div class="rb-fill" id="range-fill" style="width:5%"></div></div>
+        <div style="color:#666;font-size:.68rem;margin-top:3px;text-align:right" id="range-pct">—</div>
+      </div>
+    </div>
+
+    <div class="chart-card" style="flex:1;min-height:220px;display:flex;flex-direction:column">
+      <h3>Revenue Breakdown — Live</h3>
+      <div style="flex:1;position:relative;min-height:0">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>Contribution to Total</h3>
+      <div class="contrib-list">
+        <div class="contrib-row">
+          <span class="cr-label">B · Auth CPM Revenue</span>
+          <div class="cr-bar-wrap"><div class="cr-bar" id="cb-b"  style="width:0%;background:var(--amber)"></div></div>
+          <span class="cr-val" id="cv-b" style="color:var(--amber)">—</span>
+        </div>
+        <div class="contrib-row">
+          <span class="cr-label">C1 · AI Audio</span>
+          <div class="cr-bar-wrap"><div class="cr-bar" id="cb-c1" style="width:0%;background:var(--teal)"></div></div>
+          <span class="cr-val" id="cv-c1" style="color:var(--teal)">—</span>
+        </div>
+        <div class="contrib-row">
+          <span class="cr-label">C2 · AI Visual</span>
+          <div class="cr-bar-wrap"><div class="cr-bar" id="cb-c2" style="width:0%;background:var(--navy)"></div></div>
+          <span class="cr-val" id="cv-c2" style="color:var(--navy)">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card" style="flex-shrink:0">
+      <h3>Scenario Comparison</h3>
+      <div style="position:relative;height:130px">
+        <canvas id="scenChart"></canvas>
+      </div>
+    </div>
+
+    <div class="synergy-row">
+      <strong>THE SYNERGY: </strong>
+      A brings traffic &nbsp;→&nbsp; <strong>B</strong> converts to owned users &nbsp;→&nbsp; <strong>C</strong> monetizes that relationship
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── C2 implementation configs ────────────────────────────────────────────────
+const C2_IMPL = {
+  wsc: {
+    rev_default: 3000000, rev_min: 500000,   rev_max: 6000000,
+    cost_default: 500000, cost_min: 100000,  cost_max: 2000000,
+    rev_range: '$500K — $6M / yr', cost_range: '$100K — $2M / yr',
+    rev_note:   'Video CPM uplift + session lift from AI highlights and IBM Watson-style live hub.',
+    cost_note:  'WSC Sports licensing + integration / setup costs.',
+    desc: 'WSC Sports partnership: AI highlights, IBM Watson-style live hub. Revenue potential $2–4M/yr but requires a licensing deal.'
+  },
+  magnifi: {
+    rev_default: 800000,  rev_min: 0,        rev_max: 2000000,
+    cost_default: 20000,  cost_min: 0,       cost_max: 150000,
+    rev_range: '$0 — $2M / yr', cost_range: '$0 — $150K / yr',
+    rev_note:   'Video CPM uplift using Magnifi, already live in MM stack. Lower ceiling but near-zero incremental cost.',
+    cost_note:  'Minimal operational cost — Magnifi is already integrated into the MM platform.',
+    desc: 'Magnifi is already live in the MM stack — near-zero marginal cost. Lower revenue ceiling but essentially free to activate.'
+  }
+};
+
+function setC2Impl(mode, applyDefaults = true) {
+  const cfg = C2_IMPL[mode];
+  const sRev  = document.getElementById('s_c2_rev');
+  const sCost = document.getElementById('s_c2_cost');
+  // Update ranges
+  sRev.min  = cfg.rev_min;  sRev.max  = cfg.rev_max;
+  sCost.min = cfg.cost_min; sCost.max = cfg.cost_max;
+  // Apply defaults if requested
+  if (applyDefaults) {
+    sRev.value  = cfg.rev_default;
+    sCost.value = cfg.cost_default;
+    updateDisplay('c2_rev',  cfg.rev_default);
+    updateDisplay('c2_cost', cfg.cost_default);
+  }
+  // Update labels
+  const rrEl = document.getElementById('c2_rev_range');
+  const crEl = document.getElementById('c2_cost_range');
+  if (rrEl) rrEl.innerHTML = '<span>' + cfg.rev_range.split('—')[0].trim() + '</span><span>' + cfg.rev_range.split('—')[1].trim() + '</span>';
+  if (crEl) crEl.innerHTML = '<span>' + cfg.cost_range.split('—')[0].trim() + '</span><span>' + cfg.cost_range.split('—')[1].trim() + '</span>';
+  document.getElementById('c2_rev_note').textContent  = cfg.rev_note;
+  document.getElementById('c2_cost_note').textContent = cfg.cost_note;
+  document.getElementById('c2_impl_desc').textContent = cfg.desc;
+  calc();
+}
+
+// ── Scenario presets ─────────────────────────────────────────────────────────
+const SC = {
+  low:  { impressions:100,  ctr:7.5,  base_visitors:20000000, auth_rate:5,   visits:4, cpm:6,
+          c1_rev:1500000, c1_cost:35000,
+          c2_rev:800000,  c2_cost:20000,  c2_impl:'magnifi' },
+  base: { impressions:400,  ctr:15,   base_visitors:29000000, auth_rate:7.5, visits:4, cpm:8.5,
+          c1_rev:2250000, c1_cost:35000,
+          c2_rev:3000000, c2_cost:500000, c2_impl:'wsc' },
+  high: { impressions:800,  ctr:25,   base_visitors:35000000, auth_rate:10,  visits:4, cpm:11,
+          c1_rev:3000000, c1_cost:35000,
+          c2_rev:4000000, c2_cost:500000, c2_impl:'wsc' },
+};
+
+function applyScenario(name) {
+  const d = SC[name]; if (!d) return;
+  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector('.sc-btn.'+name);
+  if (btn) btn.classList.add('active');
+  // Set C2 implementation first (adjusts slider ranges), without applying defaults
+  if (d.c2_impl) {
+    document.getElementById('c2_impl').value = d.c2_impl;
+    setC2Impl(d.c2_impl, false);
+  }
+  // Then set all slider values
+  Object.entries(d).forEach(([k,v]) => {
+    if (k === 'c2_impl') return;
+    const s = document.getElementById('s_'+k);
+    if (s) { s.value = v; updateDisplay(k, v); }
+  });
+  calc();
+}
+
+// ── Display formatters ───────────────────────────────────────────────────────
+function fmtBig(n) {
+  if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1e3) return '$' + Math.round(n/1000) + 'K';
+  return '$' + Math.round(n);
+}
+function fmtNum(n) {
+  if (Math.abs(n) >= 1e9) return (n/1e9).toFixed(1) + 'B';
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return Math.round(n).toLocaleString();
+}
+
+function updateDisplay(id, v) {
+  const el = document.getElementById('dv-'+id);
+  if (!el) return;
+  const val = parseFloat(v);
+  const map = {
+    impressions:   () => val + 'M  (' + fmtNum(val * 1e6) + ' total)',
+    ctr:           () => val.toFixed(1) + ' / 1k',
+    base_visitors: () => fmtNum(val),
+    auth_rate:     () => val.toFixed(1) + '%',
+    visits:        () => val.toFixed(1),
+    cpm:           () => '$' + val.toFixed(2),
+    c1_rev:        () => fmtBig(val),
+    c1_cost:       () => fmtBig(val),
+    c2_rev:        () => fmtBig(val),
+    c2_cost:       () => fmtBig(val),
+  };
+  if (map[id]) el.textContent = map[id]();
+}
+
+function gv(id) { return parseFloat(document.getElementById('s_'+id).value) || 0; }
+function setEl(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
+
+// ── Charts ───────────────────────────────────────────────────────────────────
+const barCtx = document.getElementById('barChart').getContext('2d');
+const barChart = new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Auth CPM (B)', 'AI Audio (C1)', 'AI Visual (C2)'],
+    datasets: [{ data: [0,0,0], backgroundColor: ['#B45309','#0D7377','#1C2C6B'], borderRadius: 6, borderSkipped: false }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: { duration: 280 },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ' ' + fmtBig(ctx.parsed.y) + ' / yr' } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => fmtBig(v), font: { size: 10 } }, grid: { color: '#F0F0F0' } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+
+function calcScenario(sc) {
+  const d = SC[sc];
+  const newVis  = d.impressions * d.ctr * 1000;
+  const authRev = (d.base_visitors + newVis) * (d.auth_rate/100) * d.visits * d.cpm / 1000 * 12;
+  return { authRev, c1: d.c1_rev - d.c1_cost, c2: d.c2_rev - d.c2_cost };
+}
+
+const scenCtx = document.getElementById('scenChart').getContext('2d');
+const scenChart = new Chart(scenCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Low', 'Base', 'High', 'You ▶'],
+    datasets: [
+      { label: 'Auth CPM (B)', data: [0,0,0,0], backgroundColor: '#B45309', borderRadius: [0,0,0,4] },
+      { label: 'AI Audio (C1)', data: [0,0,0,0], backgroundColor: '#0D7377', borderRadius: [0,0,0,4] },
+      { label: 'AI Visual (C2)', data: [0,0,0,0], backgroundColor: '#1C2C6B', borderRadius: [0,0,0,4] },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: { duration: 280 },
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 }, padding: 8 } },
+      tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmtBig(ctx.parsed.y) } }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: { stacked: true, ticks: { callback: v => fmtBig(v), font: { size: 9 } }, grid: { color: '#F0F0F0' } }
+    }
+  }
+});
+
+['low','base','high'].forEach((sc,i) => {
+  const r = calcScenario(sc);
+  scenChart.data.datasets[0].data[i] = r.authRev;
+  scenChart.data.datasets[1].data[i] = r.c1;
+  scenChart.data.datasets[2].data[i] = r.c2;
+});
+
+// ── Main calculation ─────────────────────────────────────────────────────────
+const TARGET_LOW = 4200000, TARGET_HIGH = 8400000;
+
+function calc() {
+  // A
+  const newVis  = gv('impressions') * gv('ctr') * 1000;
+
+  // B
+  const totalVis = gv('base_visitors') + newVis;
+  const authUsers = totalVis * (gv('auth_rate') / 100);
+  const authRev   = authUsers * gv('visits') * gv('cpm') / 1000 * 12;
+
+  // C1 — margin computed from gross & cost
+  const c1Gross  = gv('c1_rev');
+  const c1Cost   = gv('c1_cost');
+  const c1Net    = c1Gross - c1Cost;
+  const c1Margin = c1Gross > 0 ? (c1Net / c1Gross * 100) : 0;
+
+  // C2 — margin computed from gross & cost
+  const c2Gross  = gv('c2_rev');
+  const c2Cost   = gv('c2_cost');
+  const c2Net    = c2Gross - c2Cost;
+  const c2Margin = c2Gross > 0 ? (c2Net / c2Gross * 100) : 0;
+
+  const total = authRev + c1Net + c2Net;
+
+  // Section header totals
+  setEl('st-a', fmtNum(newVis) + ' new / mo');
+  setEl('st-b', fmtBig(authRev));
+  setEl('st-c', fmtBig(c1Net + c2Net));
+
+  // Output pills
+  setEl('op-new-vis',    fmtNum(newVis));
+  setEl('op-new-vis-yr', fmtNum(newVis * 12));
+  setEl('op-auth-users', fmtNum(authUsers));
+  setEl('op-auth-rev',   fmtBig(authRev));
+  setEl('op-c1-net',     fmtBig(c1Net));
+  setEl('op-c2-net',     fmtBig(c2Net));
+
+  // Auto-computed margins
+  setEl('out-c1-margin', c1Margin.toFixed(1) + '%');
+  setEl('out-c2-margin', c2Margin.toFixed(1) + '%');
+
+  // Big total
+  setEl('big-total', '~' + fmtBig(total));
+  const bigEl = document.getElementById('big-total');
+  if (bigEl) bigEl.style.color = total > TARGET_HIGH ? '#27AE60' : total < TARGET_LOW ? '#E74C3C' : '#fff';
+
+  // Range indicator
+  const rfill = document.getElementById('range-fill');
+  if (rfill) rfill.style.width = Math.min(100, Math.max(5, total / TARGET_HIGH * 100)) + '%';
+  setEl('range-pct',
+    total >= TARGET_LOW && total <= TARGET_HIGH ? 'Within target range ✓' :
+    total < TARGET_LOW  ? 'Below $4.2M target' : 'Above target — great! ✓');
+
+  // Bar chart
+  barChart.data.datasets[0].data = [authRev, c1Net, c2Net];
+  barChart.update();
+
+  // Scenario chart "You" column
+  scenChart.data.datasets[0].data[3] = authRev;
+  scenChart.data.datasets[1].data[3] = c1Net;
+  scenChart.data.datasets[2].data[3] = c2Net;
+  scenChart.update();
+
+  // Contribution bars
+  const maxVal = Math.max(authRev, c1Net, c2Net, 1);
+  [['b',authRev],['c1',c1Net],['c2',c2Net]].forEach(([id,val]) => {
+    const bar = document.getElementById('cb-'+id);
+    const lbl = document.getElementById('cv-'+id);
+    if (bar) bar.style.width = Math.max(0, val / maxVal * 100) + '%';
+    if (lbl) lbl.textContent = fmtBig(val) + (total > 0 ? ' (' + (val/total*100).toFixed(0) + '%)' : '');
+  });
+}
+
+// ── Toggle card ──────────────────────────────────────────────────────────────
+function toggleCard(id) { document.getElementById(id).classList.toggle('collapsed'); }
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+['impressions','ctr','base_visitors','auth_rate','visits','cpm','c1_rev','c1_cost','c2_rev','c2_cost']
+  .forEach(id => { const s = document.getElementById('s_'+id); if (s) updateDisplay(id, s.value); });
+calc();
+</script>
+</body>
+</html>
