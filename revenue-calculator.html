@@ -1,181 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>SI Revenue Model — Interactive Growth Engine</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --red:   #C0392B;
-  --navy:  #1C2C6B;
-  --amber: #B45309;
-  --teal:  #0D7377;
-  --dark:  #1A1A1A;
-  --bg:    #F0F2F5;
-  --white: #FFFFFF;
-  --a-light: #E8EDF8;
-  --b-light: #FEF3C7;
-  --c-light: #D1FAF8;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#C0392B;--navy:#1C2C6B;--amber:#B45309;--teal:#0D7377;
+  --purple:#5B21B6;--dark:#1A1A1A;--bg:#F0F2F5;--white:#FFFFFF;
+  --a-light:#E8EDF8;--b-light:#FEF3C7;--c-light:#D1FAF8;--d-light:#EDE9FE;
 }
-body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--dark);min-height:100vh}
 
-/* ─── HEADER ──────────────────────────────────────────── */
-.hdr { background: var(--red); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.hdr-title { color: #fff; font-size: 1.25rem; font-weight: 800; }
-.hdr-sub   { color: rgba(255,255,255,.78); font-size: .78rem; }
-.sc-bar { background: var(--dark); padding: 8px 28px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.sc-bar .lbl { color: #aaa; font-size: .75rem; font-weight: 600; letter-spacing: .5px; margin-right: 4px; }
-.sc-btn { padding: 5px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: .8rem; font-weight: 700; transition: all .15s; }
-.sc-btn.low    { background: #3B82F6; color: #fff; }
-.sc-btn.base   { background: var(--navy); color: #fff; }
-.sc-btn.high   { background: var(--teal); color: #fff; }
-.sc-btn.active { box-shadow: 0 0 0 3px #FFD700; }
-.reset-btn { margin-left: auto; padding: 5px 14px; background: transparent; border: 1px solid #555; border-radius: 4px; color: #aaa; cursor: pointer; font-size: .75rem; }
-.reset-btn:hover { border-color: #aaa; color: #fff; }
+/* ── HEADER ── */
+.hdr{background:var(--red);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-title{color:#fff;font-size:1.2rem;font-weight:800}
+.hdr-sub{color:rgba(255,255,255,.78);font-size:.75rem}
+.sc-bar{background:var(--dark);padding:8px 28px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sc-bar .lbl{color:#aaa;font-size:.75rem;font-weight:600;letter-spacing:.5px;margin-right:4px}
+.sc-btn{padding:5px 14px;border:none;border-radius:4px;cursor:pointer;font-size:.78rem;font-weight:700;transition:all .15s}
+.sc-btn.low{background:#3B82F6;color:#fff}
+.sc-btn.base{background:var(--navy);color:#fff}
+.sc-btn.high{background:var(--teal);color:#fff}
+.sc-btn.active{box-shadow:0 0 0 3px #FFD700}
+.reset-btn{margin-left:auto;padding:5px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:#aaa;cursor:pointer;font-size:.73rem}
+.reset-btn:hover{border-color:#aaa;color:#fff}
 
-/* ─── LAYOUT ──────────────────────────────────────────── */
-.layout { display: grid; grid-template-columns: 430px 1fr; min-height: calc(100vh - 88px); }
-.inputs-panel { padding: 18px 16px; overflow-y: auto; background: var(--bg); }
-.charts-panel { padding: 18px 20px 24px; background: #E8EAEF; position: sticky; top: 0; height: calc(100vh - 88px); overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+/* ── LAYOUT ── */
+.layout{display:grid;grid-template-columns:460px 1fr;min-height:calc(100vh - 90px)}
+.inputs-panel{padding:16px 14px;overflow-y:auto;background:var(--bg)}
+.charts-panel{padding:16px 18px 24px;background:#E8EAEF;position:sticky;top:0;height:calc(100vh - 90px);overflow-y:auto;display:flex;flex-direction:column;gap:12px}
 
-/* ─── SECTION CARDS ───────────────────────────────────── */
-.sec-card { background: var(--white); border-radius: 10px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
-.sec-head { padding: 10px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
-.sec-head .badge { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; color: #fff; flex-shrink: 0; }
-.sec-head .sec-label { flex: 1; }
-.sec-head .sec-label strong { display: block; color: #fff; font-size: .88rem; font-weight: 700; }
-.sec-head .sec-label span   { color: rgba(255,255,255,.75); font-size: .72rem; }
-.sec-head .sec-total { background: rgba(0,0,0,.2); border-radius: 4px; padding: 3px 10px; color: #fff; font-size: .82rem; font-weight: 800; white-space: nowrap; }
-.sec-a .sec-head { background: var(--navy); }
-.sec-b .sec-head { background: var(--amber); }
-.sec-c .sec-head { background: var(--teal); }
-.sec-body { padding: 12px 16px 14px; }
-.chevron { color: rgba(255,255,255,.6); font-size: .8rem; transition: transform .2s; }
-.collapsed .chevron { transform: rotate(-90deg); }
-.collapsed .sec-body { display: none; }
+/* ── MAIN SECTION CARDS ── */
+.sec-card{background:var(--white);border-radius:10px;overflow:visible;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.sec-head{padding:10px 14px;display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;border-radius:10px 10px 0 0}
+.sec-head .badge{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.95rem;color:#fff;flex-shrink:0}
+.sec-head .sec-label{flex:1}
+.sec-head .sec-label strong{display:block;color:#fff;font-size:.85rem;font-weight:700}
+.sec-head .sec-label span{color:rgba(255,255,255,.75);font-size:.7rem}
+.sec-head .sec-total{background:rgba(0,0,0,.2);border-radius:4px;padding:3px 9px;color:#fff;font-size:.8rem;font-weight:800;white-space:nowrap}
+.sec-a .sec-head{background:var(--navy)}
+.sec-b .sec-head{background:var(--amber)}
+.sec-c .sec-head{background:var(--teal)}
+.sec-body{padding:10px 12px 12px}
+.chevron{color:rgba(255,255,255,.6);font-size:.78rem;transition:transform .2s;flex-shrink:0}
+.collapsed>.sec-body{display:none}
+.collapsed .chevron{transform:rotate(-90deg)}
+.collapsed .sec-head{border-radius:10px}
 
-/* ─── SLIDER ROWS ─────────────────────────────────────── */
-.srow { margin-bottom: 14px; }
-.srow:last-child { margin-bottom: 0; }
-.srow-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
-.srow-top .s-label { font-size: .82rem; color: #444; line-height: 1.3; }
-.srow-top .s-val { font-size: 1rem; font-weight: 800; color: var(--red); min-width: 90px; text-align: right; }
-.srow input[type=range] { width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px; background: #DDD; outline: none; cursor: pointer; margin-bottom: 2px; }
-.srow input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--red); cursor: pointer; box-shadow: 0 1px 5px rgba(0,0,0,.25); }
-.srow .s-range { display: flex; justify-content: space-between; font-size: .68rem; color: #999; }
-.disclaimer { font-size: .72rem; color: #888; font-style: italic; margin-top: 2px; padding: 3px 0 1px; line-height: 1.4; }
+/* ── SECTION CHECKBOX ── */
+.sec-chk{width:16px;height:16px;cursor:pointer;flex-shrink:0;accent-color:#FFD700}
 
-/* ─── IMPLEMENTATION SELECT ───────────────────────────── */
-.impl-row { margin-bottom: 12px; }
-.impl-row label { font-size: .8rem; font-weight: 700; color: #444; display: block; margin-bottom: 5px; }
-.impl-select { width: 100%; padding: 7px 10px; border: 1.5px solid #CCC; border-radius: 6px; font-size: .85rem; font-family: inherit; background: #fff; cursor: pointer; color: var(--dark); }
-.impl-select:focus { outline: none; border-color: var(--teal); }
-.impl-desc { font-size: .74rem; color: #666; font-style: italic; padding: 6px 10px; background: var(--c-light); border-radius: 4px; margin-top: 5px; line-height: 1.4; }
+/* ── SUB-CARDS (nested) ── */
+.sub-card{background:#F8F9FB;border:1px solid #E2E6EA;border-radius:8px;margin-bottom:10px;overflow:visible}
+.sub-card:last-child{margin-bottom:0}
+.sub-head{padding:8px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;border-radius:8px}
+.sub-head .sub-badge{font-size:.7rem;font-weight:800;color:#fff;padding:2px 7px;border-radius:3px;flex-shrink:0}
+.sub-head .sub-title{flex:1;font-size:.8rem;font-weight:700;color:#333}
+.sub-head .sub-total{font-size:.78rem;font-weight:800;padding:2px 8px;border-radius:3px;white-space:nowrap}
+.sub-body{padding:10px 12px 12px}
+.sub-chk{width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.sub-collapsed .sub-body{display:none}
+.sub-collapsed .sub-head{border-radius:8px}
+.sub-collapsed .chevron{transform:rotate(-90deg)}
 
-/* ─── COMPUTED MARGIN DISPLAY ─────────────────────────── */
-.margin-calc {
-  display: flex; align-items: center; justify-content: space-between;
-  background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 5px;
-  padding: 7px 12px; margin: 10px 0 4px; font-size: .8rem; color: #166534;
+/* Color variants for sub-badges */
+.sub-a{background:var(--navy)}.sub-a .sub-badge{background:rgba(255,255,255,.25)}
+.sub-b{background:rgba(180,83,9,.08);border-color:rgba(180,83,9,.2)}.sub-b .sub-badge{background:var(--amber)}
+.sub-c{background:rgba(13,115,119,.07);border-color:rgba(13,115,119,.2)}.sub-c .sub-badge{background:var(--teal)}
+.sub-d{background:rgba(91,33,182,.07);border-color:rgba(91,33,182,.2)}.sub-d .sub-badge{background:var(--purple)}
+
+.sub-a .sub-head{background:rgba(28,44,107,.08)}
+.sub-b .sub-head{background:rgba(180,83,9,.08)}
+.sub-c .sub-head{background:rgba(13,115,119,.07)}
+.sub-d .sub-head{background:rgba(91,33,182,.07)}
+
+.sub-a .sub-total{background:var(--a-light);color:var(--navy)}
+.sub-b .sub-total{background:var(--b-light);color:var(--amber)}
+.sub-c .sub-total{background:var(--c-light);color:var(--teal)}
+.sub-d .sub-total{background:var(--d-light);color:var(--purple)}
+
+/* ── DISABLED STATE ── */
+.disabled-section{opacity:.4;pointer-events:none}
+.disabled-section input[type=range]{cursor:not-allowed}
+
+/* ── SLIDER ROWS ── */
+.srow{margin-bottom:12px;position:relative}
+.srow:last-child{margin-bottom:0}
+.srow-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;gap:6px}
+.s-label-wrap{display:flex;align-items:baseline;gap:5px;flex:1;min-width:0}
+.s-label{font-size:.8rem;color:#444;line-height:1.3}
+.s-val{font-size:.95rem;font-weight:800;color:var(--red);min-width:80px;text-align:right;white-space:nowrap}
+.srow input[type=range]{width:100%;-webkit-appearance:none;height:5px;border-radius:3px;background:#DDD;outline:none;cursor:pointer;margin-bottom:2px}
+.srow input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--red);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.s-range{display:flex;justify-content:space-between;font-size:.66rem;color:#999}
+.note{font-size:.7rem;color:#888;font-style:italic;margin-top:2px;line-height:1.4;padding:2px 0}
+
+/* ── INFO TOOLTIP ── */
+.info-btn{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#CBD5E1;border:none;cursor:pointer;font-size:.62rem;font-weight:800;color:#475569;flex-shrink:0;line-height:1;vertical-align:middle;position:relative}
+.info-btn:hover{background:#94A3B8;color:#fff}
+.tip-wrap{position:relative;display:inline-block;vertical-align:middle}
+.tooltip{display:none;position:absolute;left:20px;top:0;z-index:999;background:#1E293B;color:#E2E8F0;font-size:.72rem;line-height:1.5;padding:8px 10px;border-radius:6px;width:240px;box-shadow:0 4px 16px rgba(0,0,0,.35);pointer-events:none}
+.tooltip.open{display:block}
+.tooltip::before{content:'';position:absolute;left:-5px;top:8px;border:5px solid transparent;border-right-color:#1E293B;border-left:0;margin-top:-2px}
+.tooltip strong{color:#94D2BD;display:block;margin-bottom:3px;font-size:.7rem;letter-spacing:.3px;text-transform:uppercase}
+
+/* ── STATIC INFO ROWS ── */
+.static-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.78rem;color:#555;border-bottom:1px dashed #EEE;margin-bottom:6px}
+.static-row .sr-val{font-weight:700;color:var(--navy)}
+
+/* ── COMPUTED PILL ── */
+.computed-row{display:flex;align-items:center;justify-content:space-between;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:5px;padding:5px 10px;margin:8px 0 4px;font-size:.78rem;color:#166534}
+.computed-row .cr-label{font-weight:600}
+.computed-row .cr-val{font-size:.9rem;font-weight:800;color:#15803D}
+.computed-row .cr-formula{font-size:.68rem;color:#6B9E7A}
+
+/* ── OUTPUT PILLS ── */
+.outputs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px dashed #EEE}
+.out-pill{flex:1;min-width:100px;background:#F8F8F8;border-radius:6px;padding:6px 9px}
+.out-pill .op-lbl{font-size:.66rem;color:#888;text-transform:uppercase;letter-spacing:.4px}
+.out-pill .op-val{font-size:.88rem;font-weight:800;color:var(--dark);margin-top:1px}
+.sec-a .out-pill{background:var(--a-light)}.sec-a .out-pill .op-val{color:var(--navy)}
+.sec-b .out-pill{background:var(--b-light)}.sec-b .out-pill .op-val{color:var(--amber)}
+.sec-c .out-pill{background:var(--c-light)}.sec-c .out-pill .op-val{color:var(--teal)}
+
+/* ── CONNECTOR ── */
+.connector{text-align:center;padding:3px 0 2px;font-size:.72rem;color:#999}
+.connector .arr{font-size:1rem;color:var(--red);display:block}
+
+/* ── PLATFORM DIVIDER ── */
+.plat-divider{font-size:.72rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 8px;padding-top:8px;border-top:1px solid #EEE}
+.plat-divider:first-child{margin-top:0;border-top:none;padding-top:0}
+
+/* ── CHARTS PANEL ── */
+.total-box{background:var(--dark);border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.tb-left .tb-label{color:#aaa;font-size:.7rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+.tb-left .tb-val{font-size:2.2rem;font-weight:900;color:#fff;line-height:1.1;transition:color .3s}
+.tb-right{text-align:right}
+.tb-right .tb-sub{font-size:.7rem;color:#666;margin-bottom:4px}
+.range-bar{width:150px;height:9px;background:#333;border-radius:5px;overflow:hidden}
+.rb-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#3B82F6,var(--red));transition:width .4s}
+.chart-card{background:var(--white);border-radius:10px;padding:12px 14px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.chart-card h3{font-size:.76rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.contrib-list{display:flex;flex-direction:column;gap:5px}
+.cr-row{display:flex;align-items:center;gap:6px}
+.cr-row .crl{font-size:.72rem;color:#555;width:120px;flex-shrink:0}
+.cr-row .crb-wrap{flex:1;background:#F0F0F0;border-radius:3px;height:12px;overflow:hidden}
+.cr-row .crb{height:100%;border-radius:3px;transition:width .4s}
+.cr-row .crv{font-size:.72rem;font-weight:700;width:65px;text-align:right}
+.synergy{background:#2D3748;border-radius:8px;padding:9px 12px;font-size:.75rem;color:#CBD5E0;text-align:center;line-height:1.6}
+.synergy strong{color:#FC8181}
+
+/* ── SECTION CHECKBOXES ACCENT ── */
+.sec-a .sec-chk{accent-color:var(--navy)}
+.sec-b .sec-chk{accent-color:var(--amber)}
+.sec-c .sec-chk{accent-color:var(--teal)}
+
+/* ── MOBILE ── */
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr}
+  .charts-panel{position:relative;height:auto}
 }
-.margin-calc .mc-label { font-weight: 600; }
-.margin-calc .mc-val   { font-size: 1rem; font-weight: 800; color: #15803D; }
-.margin-calc .mc-formula { font-size: .7rem; color: #6B9E7A; }
-
-/* ─── OUTPUT PILLS ────────────────────────────────────── */
-.outputs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #EEE; }
-.out-pill { flex: 1; min-width: 110px; background: #F8F8F8; border-radius: 6px; padding: 7px 10px; }
-.out-pill .op-lbl { font-size: .68rem; color: #888; text-transform: uppercase; letter-spacing: .4px; }
-.out-pill .op-val { font-size: .95rem; font-weight: 800; color: var(--dark); margin-top: 1px; }
-.sec-a .out-pill { background: var(--a-light); }
-.sec-a .out-pill .op-val { color: var(--navy); }
-.sec-b .out-pill { background: var(--b-light); }
-.sec-b .out-pill .op-val { color: var(--amber); }
-.sec-c .out-pill { background: var(--c-light); }
-.sec-c .out-pill .op-val { color: var(--teal); }
-
-/* ─── CONNECTOR ───────────────────────────────────────── */
-.connector { text-align: center; padding: 4px 0 2px; font-size: .75rem; color: #999; }
-.connector .arr { font-size: 1.1rem; color: var(--red); display: block; }
-
-/* ─── SUB-SECTION DIVIDER ─────────────────────────────── */
-.sub-divider { font-size: .74rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 10px; padding-top: 10px; border-top: 1px solid #EEE; }
-.sub-divider:first-child { margin-top: 0; border-top: none; padding-top: 0; }
-
-/* ─── CHARTS PANEL ────────────────────────────────────── */
-.total-box { background: var(--dark); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
-.total-box .tb-left .tb-label { color: #aaa; font-size: .72rem; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; }
-.total-box .tb-left .tb-val { font-size: 2.4rem; font-weight: 900; color: #fff; line-height: 1.1; transition: color .3s; }
-.total-box .tb-right { text-align: right; }
-.total-box .tb-right .tb-sub { font-size: .72rem; color: #666; margin-bottom: 4px; }
-.range-bar { width: 160px; height: 10px; background: #333; border-radius: 5px; position: relative; overflow: hidden; }
-.range-bar .rb-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #3B82F6, var(--red)); transition: width .4s ease; }
-.chart-card { background: var(--white); border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
-.chart-card h3 { font-size: .8rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
-.contrib-list { display: flex; flex-direction: column; gap: 6px; }
-.contrib-row { display: flex; align-items: center; gap: 8px; }
-.contrib-row .cr-label { font-size: .78rem; color: #555; width: 130px; flex-shrink: 0; }
-.contrib-row .cr-bar-wrap { flex: 1; background: #F0F0F0; border-radius: 3px; height: 14px; overflow: hidden; }
-.contrib-row .cr-bar { height: 100%; border-radius: 3px; transition: width .4s ease; }
-.contrib-row .cr-val { font-size: .78rem; font-weight: 700; width: 72px; text-align: right; }
-.synergy-row { background: #2D3748; border-radius: 8px; padding: 10px 14px; font-size: .78rem; color: #CBD5E0; text-align: center; line-height: 1.7; }
-.synergy-row strong { color: #FC8181; }
-
-@media (max-width: 800px) {
-  .layout { grid-template-columns: 1fr; }
-  .charts-panel { position: relative; height: auto; }
-}
-
-@media (max-width: 600px) {
-  /* Header */
-  .hdr { padding: 10px 14px; flex-direction: column; align-items: flex-start; gap: 4px; }
-  .hdr-title { font-size: 1rem; }
-  .hdr-sub { font-size: .72rem; }
-
-  /* Scenario bar */
-  .sc-bar { padding: 8px 14px; gap: 6px; }
-  .sc-btn { padding: 5px 12px; font-size: .75rem; }
-  .reset-btn { margin-left: 0; font-size: .72rem; }
-
-  /* Layout */
-  .inputs-panel { padding: 12px 10px; }
-  .charts-panel { padding: 12px 10px 18px; }
-
-  /* Section cards */
-  .sec-head { padding: 10px 12px; gap: 8px; }
-  .sec-head .badge { width: 26px; height: 26px; font-size: .88rem; }
-  .sec-head .sec-label strong { font-size: .82rem; }
-  .sec-head .sec-label span   { font-size: .68rem; }
-  .sec-head .sec-total { font-size: .76rem; padding: 3px 8px; }
-  .sec-body { padding: 10px 12px 12px; }
-
-  /* Slider rows */
-  .srow-top .s-label { font-size: .78rem; }
-  .srow-top .s-val   { font-size: .9rem; min-width: 76px; }
-
-  /* Output pills — stack to 2 per row */
-  .outputs { gap: 6px; }
-  .out-pill { min-width: calc(50% - 3px); }
-  .out-pill .op-val { font-size: .88rem; }
-
-  /* Total box */
-  .total-box { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
-  .total-box .tb-left .tb-val { font-size: 1.9rem; }
-  .total-box .tb-right { width: 100%; }
-  .range-bar { width: 100%; }
-
-  /* Contribution rows */
-  .contrib-row .cr-label { width: 100px; font-size: .72rem; }
-  .contrib-row .cr-val   { width: 60px; font-size: .72rem; }
-
-  /* Synergy row */
-  .synergy-row { font-size: .74rem; line-height: 1.6; }
-
-  /* Margin calc */
-  .margin-calc { flex-direction: column; align-items: flex-start; gap: 4px; }
-  .margin-calc .mc-val { font-size: .92rem; }
+@media(max-width:600px){
+  .hdr{padding:10px 12px;flex-direction:column;align-items:flex-start;gap:4px}
+  .hdr-title{font-size:1rem}
+  .sc-bar{padding:8px 12px;gap:6px}
+  .sc-btn{padding:4px 10px;font-size:.73rem}
+  .reset-btn{margin-left:0}
+  .inputs-panel,.charts-panel{padding:10px 8px}
+  .sec-head{padding:8px 10px}
+  .total-box{flex-direction:column;align-items:flex-start;gap:8px}
+  .tb-left .tb-val{font-size:1.8rem}
+  .range-bar{width:100%}
+  .tooltip{width:200px}
+  .cr-row .crl{width:90px;font-size:.68rem}
+  .outputs{gap:5px}
+  .out-pill{min-width:calc(50% - 3px)}
 }
 </style>
 </head>
@@ -183,352 +185,996 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color:
 
 <div class="hdr">
   <div>
-    <div class="hdr-title">SI Revenue Model &mdash; A → B → C Growth Engine</div>
-    <div class="hdr-sub">Move any slider to see instant revenue impact &nbsp;·&nbsp; Phase 2 · April 2026</div>
+    <div class="hdr-title">SI Revenue Model &mdash; A &rarr; B &rarr; C Full Monetization Stack</div>
+    <div class="hdr-sub">Move any slider · toggle sections on/off · see instant revenue impact &nbsp;·&nbsp; Phase 2 · April 2026</div>
   </div>
 </div>
 
 <div class="sc-bar">
   <span class="lbl">SCENARIO:</span>
-  <button class="sc-btn low"       onclick="applyScenario('low')">Low</button>
+  <button class="sc-btn low" onclick="applyScenario('low')">Low</button>
   <button class="sc-btn base active" onclick="applyScenario('base')">Base</button>
-  <button class="sc-btn high"      onclick="applyScenario('high')">High</button>
-  <button class="reset-btn"        onclick="applyScenario('base')">↺ Reset to Base</button>
+  <button class="sc-btn high" onclick="applyScenario('high')">High</button>
+  <button class="reset-btn" onclick="applyScenario('base')">↺ Reset</button>
 </div>
 
 <div class="layout">
+<!-- ══════════════════ INPUTS PANEL ══════════════════ -->
+<div class="inputs-panel">
 
-  <!-- ══ INPUTS PANEL ════════════════════════════════════ -->
-  <div class="inputs-panel">
-
-    <!-- SECTION A -->
-    <div class="sec-card sec-a" id="card-a">
-      <div class="sec-head" onclick="toggleCard('card-a')">
-        <div class="badge">A</div>
-        <div class="sec-label">
-          <strong>Distribution &amp; User Attraction</strong>
-          <span>AI Citation Engine — traffic from AI search</span>
-        </div>
-        <div class="sec-total" id="st-a">0 visitors</div>
-        <span class="chevron">▾</span>
-      </div>
-      <div class="sec-body">
-
-        <div class="srow">
-          <div class="srow-top">
-            <span class="s-label">AI engine monthly impressions</span>
-            <span class="s-val" id="dv-impressions">400M</span>
-          </div>
-          <input type="range" id="s_impressions" min="10" max="1500" step="10" value="400"
-                 oninput="updateDisplay('impressions', this.value); calc()">
-          <div class="s-range"><span>10M</span><span>1,500M</span></div>
-          <div class="disclaimer">
-            Value in millions — 400 means 400,000,000 total views/mo across all AI engines (Claude, ChatGPT, Gemini, Perplexity…).
-            Estimated from the Section A citation tracker.
-          </div>
-        </div>
-
-        <div class="srow">
-          <div class="srow-top">
-            <span class="s-label">AI-to-site click-through rate</span>
-            <span class="s-val" id="dv-ctr">15.0 / 1k</span>
-          </div>
-          <input type="range" id="s_ctr" min="1" max="40" step="0.5" value="15"
-                 oninput="updateDisplay('ctr', this.value); calc()">
-          <div class="s-range"><span>1 / 1k</span><span>40 / 1k</span></div>
-          <div class="disclaimer">
-            Clicks per 1,000 AI impressions. &nbsp;<strong>Default: 15 = 1.5% CTR</strong> — per the Section A AI citation model benchmark.
-            Industry range: 0.5–3%.
-          </div>
-        </div>
-
-        <div class="outputs">
-          <div class="out-pill"><div class="op-lbl">New visitors / mo</div><div class="op-val" id="op-new-vis">—</div></div>
-          <div class="out-pill"><div class="op-lbl">New visitors / yr</div><div class="op-val" id="op-new-vis-yr">—</div></div>
-        </div>
-      </div>
+<!-- ████ SECTION A ████ -->
+<div class="sec-card sec-a" id="card-a">
+  <div class="sec-head" onclick="toggleCard('card-a',event)">
+    <input type="checkbox" class="sec-chk" id="chk-a" checked onclick="toggleSection('a',event)">
+    <div class="badge">A</div>
+    <div class="sec-label">
+      <strong>Distribution &amp; User Attraction</strong>
+      <span>AI Citation Engine + Social Media</span>
     </div>
+    <div class="sec-total" id="st-a">$0</div>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sec-body">
 
-    <div class="connector"><span class="arr">↓</span>A feeds B — new visitors enter the auth funnel</div>
-
-    <!-- SECTION B -->
-    <div class="sec-card sec-b" id="card-b">
-      <div class="sec-head" onclick="toggleCard('card-b')">
-        <div class="badge">B</div>
-        <div class="sec-label">
-          <strong>User Engagement &amp; Loyalty</strong>
-          <span>Auth Engine — converting visitors to owned audience</span>
-        </div>
-        <div class="sec-total" id="st-b">$0</div>
-        <span class="chevron">▾</span>
+    <!-- A1: AI Citation Engine -->
+    <div class="sub-card sub-a" id="sub-a1">
+      <div class="sub-head" onclick="toggleSub('sub-a1',event)">
+        <input type="checkbox" class="sub-chk" id="chk-a1" checked onclick="toggleSub2('a1',event)">
+        <span class="sub-badge">A1</span>
+        <span class="sub-title">AI Citation Engine — Traffic from AI Search</span>
+        <span class="sub-total" id="sst-a1">$0</span>
+        <span class="chevron" style="color:#555">▾</span>
       </div>
-      <div class="sec-body">
-        <div class="srow">
-          <div class="srow-top">
-            <span class="s-label">Base monthly site visitors (organic)</span>
-            <span class="s-val" id="dv-base_visitors">29M</span>
-          </div>
-          <input type="range" id="s_base_visitors" min="1000000" max="60000000" step="500000" value="29000000"
-                 oninput="updateDisplay('base_visitors', this.value); calc()">
-          <div class="s-range"><span>1M</span><span>60M</span></div>
-        </div>
-        <div class="srow">
-          <div class="srow-top">
-            <span class="s-label">Auth conversion rate</span>
-            <span class="s-val" id="dv-auth_rate">7.5%</span>
-          </div>
-          <input type="range" id="s_auth_rate" min="0.5" max="30" step="0.5" value="7.5"
-                 oninput="updateDisplay('auth_rate', this.value); calc()">
-          <div class="s-range"><span>0.5%</span><span>30%</span></div>
-          <div class="disclaimer">% of all visitors who authenticate (create account / sign in). Model range: 5–10%.</div>
-        </div>
-        <div class="srow">
-          <div class="srow-top">
-            <span class="s-label">Avg visits per month per auth user</span>
-            <span class="s-val" id="dv-visits">4.0</span>
-          </div>
-          <input type="range" id="s_visits" min="1" max="20" step="0.5" value="4"
-                 oninput="updateDisplay('visits', this.value); calc()">
-          <div class="s-range"><span>1</span><span>20 / mo</span></div>
-        </div>
-        <div class="srow">
-          <div class="srow-top">
-            <span class="s-label">CPM uplift — auth vs. anonymous</span>
-            <span class="s-val" id="dv-cpm">$8.50</span>
-          </div>
-          <input type="range" id="s_cpm" min="1" max="25" step="0.5" value="8.5"
-                 oninput="updateDisplay('cpm', this.value); calc()">
-          <div class="s-range"><span>$1</span><span>$25 / 1k views</span></div>
-          <div class="disclaimer">Additional $ per 1,000 ad impressions from authenticated users. Model: $6–11 uplift (anon $2–4 → auth $8–15).</div>
-        </div>
-        <div class="outputs">
-          <div class="out-pill"><div class="op-lbl">Auth users</div><div class="op-val" id="op-auth-users">—</div></div>
-          <div class="out-pill"><div class="op-lbl">Auth CPM Rev / yr</div><div class="op-val" id="op-auth-rev">—</div></div>
-        </div>
-      </div>
-    </div>
+      <div class="sub-body" id="body-a1">
 
-    <div class="connector"><span class="arr">↓</span>B upgrades C — auth audience enables premium revenue</div>
-
-    <!-- SECTION C -->
-    <div class="sec-card sec-c" id="card-c">
-      <div class="sec-head" onclick="toggleCard('card-c')">
-        <!-- No badge per user request -->
-        <div class="sec-label">
-          <strong>Monetization — Capabilities</strong>
-          <span>AI Audio (ElevenLabs) + AI Visual (Magnifi / WSC Sports)</span>
+        <div class="static-row">
+          <span>AI sports queries / month (fixed benchmark
+            <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Semrush Jul 2025: ~400M AI sports queries/month. Fixed as external market figure SI cannot control. Sets the ceiling for all A1 traffic models.</div></span>)
+          </span>
+          <span class="sr-val">400M</span>
         </div>
-        <div class="sec-total" id="st-c">$0</div>
-        <span class="chevron">▾</span>
-      </div>
-      <div class="sec-body">
 
-        <!-- CAP 1 -->
-        <div class="sub-divider">Capability 1 — AI Audio Personalization &nbsp;·&nbsp; Lead partner: ElevenLabs</div>
-
-        <div class="srow">
-          <div class="srow-top">
-            <span class="s-label">Gross revenue — AI Audio Personalization</span>
-            <span class="s-val" id="dv-c1_rev">$2.25M</span>
-          </div>
-          <input type="range" id="s_c1_rev" min="0" max="6000000" step="50000" value="2250000"
-                 oninput="updateDisplay('c1_rev', this.value); calc()">
-          <div class="s-range"><span>$0</span><span>$6M / yr</span></div>
-          <div class="disclaimer">CPM uplift + podcast ad revenue. Model range: $1.5–3M/yr.</div>
+        <div class="static-row">
+          <span>CTR when cited (fixed)
+            <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 14: 'CITATION-TO-CLICK RATE (CTR): 1.5%' — fixed benchmark. Industry-standard rate across all companies. Stored as 0.015 decimal.</div></span>
+          </span>
+          <span class="sr-val">1.5%</span>
         </div>
 
         <div class="srow">
           <div class="srow-top">
-            <span class="s-label">Implementation cost — API (ElevenLabs)</span>
-            <span class="s-val" id="dv-c1_cost">$35K</span>
+            <div class="s-label-wrap">
+              <span class="s-label">SI citation rate (per 1,000 AI queries)</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 14 bar chart shows 10/20/30 per 1,000 queries. Core lever: 400M × rate/1000 × 1.5% = new SI visits. Currently SI gets ~0. Low=conservative entry, High=full optimisation.</div></span>
+            </div>
+            <span class="s-val" id="dv-citation_rate">20 / 1k</span>
           </div>
-          <input type="range" id="s_c1_cost" min="0" max="500000" step="5000" value="35000"
-                 oninput="updateDisplay('c1_cost', this.value); calc()">
-          <div class="s-range"><span>$0</span><span>$500K / yr</span></div>
-          <div class="disclaimer">~$35K/yr API cost at SI's scale (ElevenLabs enterprise publisher tier).</div>
+          <input type="range" id="s_citation_rate" min="1" max="50" step="1" value="20" oninput="upd('citation_rate',this.value);calc()">
+          <div class="s-range"><span>1</span><span>50 / 1k</span></div>
         </div>
 
-        <div class="margin-calc">
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Site RPM (blended ad rate per 1,000 page views)</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 15: '$15–$30 RPM range (industry benchmarks, Appendix C)'. Determines what each incremental SI.com visit is worth in ad revenue.</div></span>
+            </div>
+            <span class="s-val" id="dv-site_rpm">$20</span>
+          </div>
+          <input type="range" id="s_site_rpm" min="5" max="50" step="1" value="20" oninput="upd('site_rpm',this.value);calc()">
+          <div class="s-range"><span>$5</span><span>$50</span></div>
+        </div>
+
+        <div class="computed-row">
           <div>
-            <div class="mc-label">Computed Net Margin — Cap 1</div>
-            <div class="mc-formula">(Gross Revenue − API Cost) ÷ Gross Revenue</div>
+            <div class="cr-label">New visitors / mo (computed)</div>
+            <div class="cr-formula">400M × citation_rate/1000 × 1.5%</div>
           </div>
-          <div class="mc-val" id="out-c1-margin">—</div>
+          <div class="cr-val" id="out-a1-vis">—</div>
         </div>
 
         <div class="outputs">
-          <div class="out-pill"><div class="op-lbl">▶ Net Revenue / yr</div><div class="op-val" id="op-c1-net">—</div></div>
+          <div class="out-pill"><div class="op-lbl">New visitors / mo</div><div class="op-val" id="op-a1-vis">—</div></div>
+          <div class="out-pill"><div class="op-lbl">A1 Revenue / yr</div><div class="op-val" id="op-a1-rev">—</div></div>
         </div>
+      </div>
+    </div><!-- /sub-a1 -->
 
-        <!-- CAP 2 -->
-        <div class="sub-divider">Capability 2 — AI Visual + Live Coverage</div>
+    <div class="connector"><span class="arr">↓</span>A1 traffic feeds B1 visitor pool</div>
 
-        <div class="impl-row">
-          <label>Implementation method:</label>
-          <select class="impl-select" id="c2_impl" onchange="setC2Impl(this.value)">
-            <option value="wsc">WSC Sports — external partnership</option>
-            <option value="magnifi">Magnifi — native (already in MM stack)</option>
-          </select>
-          <div class="impl-desc" id="c2_impl_desc">
-            WSC Sports partnership: AI highlights, IBM Watson-style live hub. Revenue potential $2–4M/yr but requires a licensing deal.
-          </div>
-        </div>
+    <!-- A2: Social Distribution -->
+    <div class="sub-card sub-a" id="sub-a2">
+      <div class="sub-head" onclick="toggleSub('sub-a2',event)">
+        <input type="checkbox" class="sub-chk" id="chk-a2" checked onclick="toggleSub2('a2',event)">
+        <span class="sub-badge">A2</span>
+        <span class="sub-title">Social Distribution — YouTube · TikTok · Instagram · X</span>
+        <span class="sub-total" id="sst-a2">$0</span>
+        <span class="chevron" style="color:#555">▾</span>
+      </div>
+      <div class="sub-body" id="body-a2">
 
+        <!-- Social referral CTR -->
         <div class="srow">
           <div class="srow-top">
-            <span class="s-label">Gross revenue — AI Visual + Live Coverage</span>
-            <span class="s-val" id="dv-c2_rev">$3.0M</span>
+            <div class="s-label-wrap">
+              <span class="s-label">Social referral CTR to SI.com</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Industry estimate: 0.5–1.5% typical for sports media link-in-bio / swipe-ups. CRITICAL: social growth doesn't just earn platform revenue — it drives SI.com traffic feeding B1 auth pool.</div></span>
+            </div>
+            <span class="s-val" id="dv-social_ctr">1.0%</span>
           </div>
-          <input type="range" id="s_c2_rev" min="500000" max="6000000" step="50000" value="3000000"
-                 oninput="updateDisplay('c2_rev', this.value); calc()">
-          <div class="s-range" id="c2_rev_range"><span>$500K</span><span>$6M / yr</span></div>
-          <div class="disclaimer" id="c2_rev_note">Video CPM uplift + session length lift from AI-generated highlights and live hub.</div>
+          <input type="range" id="s_social_ctr" min="0.1" max="3" step="0.1" value="1" oninput="upd('social_ctr',this.value);calc()">
+          <div class="s-range"><span>0.1%</span><span>3%</span></div>
+          <div class="note">% of total social views/impressions that click through to SI.com. Feeds B1 visitor pool.</div>
         </div>
 
-        <div class="srow">
-          <div class="srow-top">
-            <span class="s-label">Implementation cost</span>
-            <span class="s-val" id="dv-c2_cost">$500K</span>
+        <!-- YouTube -->
+        <div class="plat-divider">
+          <input type="checkbox" class="sub-chk" id="chk-yt" checked onclick="togglePlatform('yt',event)"> YouTube
+        </div>
+        <div id="body-yt">
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Monthly views (M)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: Current 613K subs / ~1.5M views → Target 1.5M subs / ~8M views/mo. YouTube is SI's strongest long-form platform — views drive both RPM revenue and audience growth.</div></span>
+              </div>
+              <span class="s-val" id="dv-yt_views">4.0M</span>
+            </div>
+            <input type="range" id="s_yt_views" min="0.5" max="15" step="0.5" value="4" oninput="upd('yt_views',this.value);calc()">
+            <div class="s-range"><span>0.5M</span><span>15M</span></div>
           </div>
-          <input type="range" id="s_c2_cost" min="100000" max="2000000" step="25000" value="500000"
-                 oninput="updateDisplay('c2_cost', this.value); calc()">
-          <div class="s-range" id="c2_cost_range"><span>$100K</span><span>$2M / yr</span></div>
-          <div class="disclaimer" id="c2_cost_note">WSC Sports licensing + integration costs.</div>
-        </div>
-
-        <div class="margin-calc">
-          <div>
-            <div class="mc-label">Computed Net Margin — Cap 2</div>
-            <div class="mc-formula">(Gross Revenue − Implementation Cost) ÷ Gross Revenue</div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Ad RPM ($/1,000 views)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: 'Ad RPM $3–8'. Sources: Lenos 2026, Post-Bridge 2025. Sports content commands mid-range YouTube RPM.</div></span>
+              </div>
+              <span class="s-val" id="dv-yt_rpm">$5.00</span>
+            </div>
+            <input type="range" id="s_yt_rpm" min="1" max="12" step="0.5" value="5" oninput="upd('yt_rpm',this.value);calc()">
+            <div class="s-range"><span>$1</span><span>$12</span></div>
           </div>
-          <div class="mc-val" id="out-c2-margin">—</div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Sponsored deals / month</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: Current 1 sponsor/mo → Target 4 sponsors/mo at scale. Based on 613K→1.5M subs audience size. Industry: $3K–$15K at this tier.</div></span>
+              </div>
+              <span class="s-val" id="dv-yt_deals">2</span>
+            </div>
+            <input type="range" id="s_yt_deals" min="0" max="8" step="1" value="2" oninput="upd('yt_deals',this.value);calc()">
+            <div class="s-range"><span>0</span><span>8 / mo</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Deal value (per sponsored deal)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: Current $54K–$216K/yr; 18-mo target $588K–$1.5M/yr. Industry: $3K–$15K per deal at 613K–1.5M subs.</div></span>
+              </div>
+              <span class="s-val" id="dv-yt_deal_val">$6,000</span>
+            </div>
+            <input type="range" id="s_yt_deal_val" min="1000" max="20000" step="500" value="6000" oninput="upd('yt_deal_val',this.value);calc()">
+            <div class="s-range"><span>$1K</span><span>$20K</span></div>
+          </div>
+          <div class="outputs sec-a">
+            <div class="out-pill"><div class="op-lbl">YouTube / yr</div><div class="op-val" id="op-yt">—</div></div>
+          </div>
         </div>
 
-        <div class="outputs">
-          <div class="out-pill"><div class="op-lbl">▶ Net Revenue / yr</div><div class="op-val" id="op-c2-net">—</div></div>
+        <!-- TikTok -->
+        <div class="plat-divider">
+          <input type="checkbox" class="sub-chk" id="chk-tt" checked onclick="togglePlatform('tt',event)"> TikTok
+        </div>
+        <div id="body-tt">
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Monthly views (M)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: 1.9M followers / ~10M views → Target 4M followers / ~30M views/mo. TikTok's creator fund RPM is lower but volume is higher.</div></span>
+              </div>
+              <span class="s-val" id="dv-tt_views">20M</span>
+            </div>
+            <input type="range" id="s_tt_views" min="1" max="50" step="1" value="20" oninput="upd('tt_views',this.value);calc()">
+            <div class="s-range"><span>1M</span><span>50M</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Rewards RPM ($/1,000 views)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: 'Rewards RPM $0.40–$1'. Sources: Bluehost 2026, TikTok Support. $0.40–$1.00 is the current TikTok Rewards payout range.</div></span>
+              </div>
+              <span class="s-val" id="dv-tt_rpm">$0.70</span>
+            </div>
+            <input type="range" id="s_tt_rpm" min="0.1" max="2" step="0.1" value="0.7" oninput="upd('tt_rpm',this.value);calc()">
+            <div class="s-range"><span>$0.10</span><span>$2.00</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Brand deals / month</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: Current 2 deals/mo → Target 6 deals/mo at scale.</div></span>
+              </div>
+              <span class="s-val" id="dv-tt_deals">4</span>
+            </div>
+            <input type="range" id="s_tt_deals" min="0" max="12" step="1" value="4" oninput="upd('tt_deals',this.value);calc()">
+            <div class="s-range"><span>0</span><span>12 / mo</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Brand deal value (per deal)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Estimated for 1.9M–4M follower tier. Industry range $2K–$10K. Slide 19: Current $48K–$168K/yr; 18-mo target $324K–$960K/yr.</div></span>
+              </div>
+              <span class="s-val" id="dv-tt_deal_val">$5,000</span>
+            </div>
+            <input type="range" id="s_tt_deal_val" min="500" max="15000" step="500" value="5000" oninput="upd('tt_deal_val',this.value);calc()">
+            <div class="s-range"><span>$500</span><span>$15K</span></div>
+          </div>
+          <div class="outputs sec-a">
+            <div class="out-pill"><div class="op-lbl">TikTok / yr</div><div class="op-val" id="op-tt">—</div></div>
+          </div>
+        </div>
+
+        <!-- Instagram -->
+        <div class="plat-divider">
+          <input type="checkbox" class="sub-chk" id="chk-ig" checked onclick="togglePlatform('ig',event)"> Instagram
+        </div>
+        <div id="body-ig">
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Branded / sponsored posts / month</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: '3 branded posts/mo @ $3K–$10K' → '6 posts/mo @ $5K–$15K'. Instagram's primary monetisation at 2M followers (target 4M).</div></span>
+              </div>
+              <span class="s-val" id="dv-ig_posts">5</span>
+            </div>
+            <input type="range" id="s_ig_posts" min="0" max="12" step="1" value="5" oninput="upd('ig_posts',this.value);calc()">
+            <div class="s-range"><span>0</span><span>12 / mo</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Post value (per branded post)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: '$3K–$10K current; $5K–$15K target'. InfluenceFlow 2026, Shopify 2026. Deal count and value scale with audience size.</div></span>
+              </div>
+              <span class="s-val" id="dv-ig_val">$8,000</span>
+            </div>
+            <input type="range" id="s_ig_val" min="1000" max="20000" step="500" value="8000" oninput="upd('ig_val',this.value);calc()">
+            <div class="s-range"><span>$1K</span><span>$20K</span></div>
+          </div>
+          <div class="outputs sec-a">
+            <div class="out-pill"><div class="op-lbl">Instagram / yr</div><div class="op-val" id="op-ig">—</div></div>
+          </div>
+        </div>
+
+        <!-- X/Twitter -->
+        <div class="plat-divider">
+          <input type="checkbox" class="sub-chk" id="chk-tw" checked onclick="togglePlatform('tw',event)"> X / Twitter
+        </div>
+        <div id="body-tw">
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Monthly impressions (M)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: 1.83M followers / ~15M impr → Target 3.5M followers / ~40M impr/mo. Less critical than TikTok/YouTube for Gen-Z but important for real-time sports commentary.</div></span>
+              </div>
+              <span class="s-val" id="dv-tw_impr">28M</span>
+            </div>
+            <input type="range" id="s_tw_impr" min="1" max="80" step="1" value="28" oninput="upd('tw_impr',this.value);calc()">
+            <div class="s-range"><span>1M</span><span>80M</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Revenue share RPM ($/1,000 impr.)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: 'Rev share RPM $0.10–$0.30'. Wask 2026, Influencer Marketing Hub 2026. Lowest RPM of all platforms.</div></span>
+              </div>
+              <span class="s-val" id="dv-tw_rpm">$0.20</span>
+            </div>
+            <input type="range" id="s_tw_rpm" min="0.05" max="0.5" step="0.05" value="0.2" oninput="upd('tw_rpm',this.value);calc()">
+            <div class="s-range"><span>$0.05</span><span>$0.50</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Brand deals / month</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: Current 1 deal/mo → Target 3 deals/mo at scale.</div></span>
+              </div>
+              <span class="s-val" id="dv-tw_deals">2</span>
+            </div>
+            <input type="range" id="s_tw_deals" min="0" max="6" step="1" value="2" oninput="upd('tw_deals',this.value);calc()">
+            <div class="s-range"><span>0</span><span>6 / mo</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Deal value (per brand deal)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Estimated for 1.83M–3.5M follower tier. Deal values typically lower than IG/YouTube. Industry: $500–$5K.</div></span>
+              </div>
+              <span class="s-val" id="dv-tw_deal_val">$2,000</span>
+            </div>
+            <input type="range" id="s_tw_deal_val" min="0" max="8000" step="250" value="2000" oninput="upd('tw_deal_val',this.value);calc()">
+            <div class="s-range"><span>$0</span><span>$8K</span></div>
+          </div>
+          <div class="outputs sec-a">
+            <div class="out-pill"><div class="op-lbl">X/Twitter / yr</div><div class="op-val" id="op-tw">—</div></div>
+          </div>
+        </div>
+
+        <div class="outputs sec-a" style="margin-top:12px;padding-top:10px;border-top:1px dashed #CCC">
+          <div class="out-pill"><div class="op-lbl">Social referral visitors / mo</div><div class="op-val" id="op-a2-ref">—</div></div>
+          <div class="out-pill"><div class="op-lbl">A2 Total Revenue / yr</div><div class="op-val" id="op-a2-rev">—</div></div>
         </div>
 
       </div>
-    </div>
-
-  </div><!-- /inputs-panel -->
-
-  <!-- ══ CHARTS PANEL ════════════════════════════════════ -->
-  <div class="charts-panel">
-
-    <div class="total-box">
-      <div class="tb-left">
-        <div class="tb-label">Total Year 1 Revenue</div>
-        <div class="tb-val" id="big-total">—</div>
-        <div style="color:#888;font-size:.7rem;margin-top:3px">Auth CPM + AI Audio + AI Visual</div>
-      </div>
-      <div class="tb-right">
-        <div class="tb-sub">vs. $4.2–8.4M target range</div>
-        <div class="range-bar"><div class="rb-fill" id="range-fill" style="width:5%"></div></div>
-        <div style="color:#666;font-size:.68rem;margin-top:3px;text-align:right" id="range-pct">—</div>
-      </div>
-    </div>
-
-    <div class="chart-card" style="flex:1;min-height:220px;display:flex;flex-direction:column">
-      <h3>Revenue Breakdown — Live</h3>
-      <div style="flex:1;position:relative;min-height:0">
-        <canvas id="barChart"></canvas>
-      </div>
-    </div>
-
-    <div class="chart-card">
-      <h3>Contribution to Total</h3>
-      <div class="contrib-list">
-        <div class="contrib-row">
-          <span class="cr-label">B · Auth CPM Revenue</span>
-          <div class="cr-bar-wrap"><div class="cr-bar" id="cb-b"  style="width:0%;background:var(--amber)"></div></div>
-          <span class="cr-val" id="cv-b" style="color:var(--amber)">—</span>
-        </div>
-        <div class="contrib-row">
-          <span class="cr-label">C1 · AI Audio</span>
-          <div class="cr-bar-wrap"><div class="cr-bar" id="cb-c1" style="width:0%;background:var(--teal)"></div></div>
-          <span class="cr-val" id="cv-c1" style="color:var(--teal)">—</span>
-        </div>
-        <div class="contrib-row">
-          <span class="cr-label">C2 · AI Visual</span>
-          <div class="cr-bar-wrap"><div class="cr-bar" id="cb-c2" style="width:0%;background:var(--navy)"></div></div>
-          <span class="cr-val" id="cv-c2" style="color:var(--navy)">—</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="chart-card" style="flex-shrink:0">
-      <h3>Scenario Comparison</h3>
-      <div style="position:relative;height:130px">
-        <canvas id="scenChart"></canvas>
-      </div>
-    </div>
-
-    <div class="synergy-row">
-      <strong>THE SYNERGY: </strong>
-      A brings traffic &nbsp;→&nbsp; <strong>B</strong> converts to owned users &nbsp;→&nbsp; <strong>C</strong> monetizes that relationship
-    </div>
+    </div><!-- /sub-a2 -->
 
   </div>
-</div>
+</div><!-- /sec-a -->
+
+<div class="connector"><span class="arr">↓</span>A feeds B — traffic enters the authentication funnel</div>
+
+<!-- ████ SECTION B ████ -->
+<div class="sec-card sec-b" id="card-b">
+  <div class="sec-head" onclick="toggleCard('card-b',event)">
+    <input type="checkbox" class="sec-chk" id="chk-b" checked onclick="toggleSection('b',event)">
+    <div class="badge">B</div>
+    <div class="sec-label">
+      <strong>User Loyalty &amp; Engagement</strong>
+      <span>Auth Engine + AI Capabilities</span>
+    </div>
+    <div class="sec-total" id="st-b">$0</div>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sec-body">
+
+    <!-- B1: Auth Engine -->
+    <div class="sub-card sub-b" id="sub-b1">
+      <div class="sub-head" onclick="toggleSub('sub-b1',event)">
+        <input type="checkbox" class="sub-chk" id="chk-b1" checked onclick="toggleSub2('b1',event)">
+        <span class="sub-badge" style="background:var(--amber)">B1</span>
+        <span class="sub-title">Auth Engine — Converting Visitors to Owned Audience</span>
+        <span class="sub-total" style="background:var(--b-light);color:var(--amber)" id="sst-b1">$0</span>
+        <span class="chevron" style="color:#555">▾</span>
+      </div>
+      <div class="sub-body" id="body-b1">
+
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">SI base organic monthly visitors</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 25: '29M monthly visitors'. Slide 28: '29M anonymous visitors today'. Semrush Feb 2026. Low=conservative; High=growth scenario. This is the foundational traffic base before any A-section additions.</div></span>
+            </div>
+            <span class="s-val" id="dv-base_visitors">29M</span>
+          </div>
+          <input type="range" id="s_base_visitors" min="10000000" max="60000000" step="500000" value="29000000" oninput="upd('base_visitors',this.value);calc()">
+          <div class="s-range"><span>10M</span><span>60M</span></div>
+        </div>
+
+        <div class="computed-row">
+          <div>
+            <div class="cr-label">Total visitors / mo (base + A1 + A2 referral)</div>
+            <div class="cr-formula">Auto-linked from A1 &amp; A2 — toggle above to change</div>
+          </div>
+          <div class="cr-val" id="out-b1-vis">—</div>
+        </div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Auth conversion rate</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 28: '5–10% auth conversion'. Current: ~3% (Slide 25). Peer avg: 28%. 4 activations drive the gap: My SI, Pick'em, Game Hub, Fan community. The single most important lever in the model.</div></span>
+            </div>
+            <span class="s-val" id="dv-auth_rate">7.5%</span>
+          </div>
+          <input type="range" id="s_auth_rate" min="0.5" max="25" step="0.5" value="7.5" oninput="upd('auth_rate',this.value);calc()">
+          <div class="s-range"><span>0.5%</span><span>25%</span></div>
+        </div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Anonymous CPM (current ad yield)</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 28: 'CPM uplift $2–4 (anon) → $8–$15 (auth)'. Anonymous baseline = $2–4. Semrush si.com CPM benchmarks Feb 2026.</div></span>
+            </div>
+            <span class="s-val" id="dv-anon_cpm">$3.00</span>
+          </div>
+          <input type="range" id="s_anon_cpm" min="1" max="8" step="0.5" value="3" oninput="upd('anon_cpm',this.value);calc()">
+          <div class="s-range"><span>$1</span><span>$8 / 1k views</span></div>
+        </div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Authenticated CPM (premium ad yield)</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 28: 'Auth CPM $8–$15'. Semrush si.com CPM benchmarks Feb 2026, Elemental Plus publisher data. Logged-in users get higher CPM due to identity graph data.</div></span>
+            </div>
+            <span class="s-val" id="dv-auth_cpm">$11.50</span>
+          </div>
+          <input type="range" id="s_auth_cpm" min="4" max="25" step="0.5" value="11.5" oninput="upd('auth_cpm',this.value);calc()">
+          <div class="s-range"><span>$4</span><span>$25 / 1k views</span></div>
+        </div>
+
+        <div class="computed-row">
+          <div>
+            <div class="cr-label">CPM uplift (auth − anon) — auto-computed</div>
+          </div>
+          <div class="cr-val" id="out-b1-uplift">—</div>
+        </div>
+
+        <div class="note">Avg 4 visits/user/mo fixed. Formula: auth_users × 4 visits × CPM_uplift ÷ 1,000 × 12</div>
+
+        <div class="outputs sec-b">
+          <div class="out-pill"><div class="op-lbl">Authenticated users</div><div class="op-val" id="op-b1-auth">—</div></div>
+          <div class="out-pill"><div class="op-lbl">B1 Auth CPM Rev / yr</div><div class="op-val" id="op-b1-rev">—</div></div>
+        </div>
+      </div>
+    </div><!-- /sub-b1 -->
+
+    <!-- B2.1: AI Audio -->
+    <div class="sub-card sub-b" id="sub-b21">
+      <div class="sub-head" onclick="toggleSub('sub-b21',event)">
+        <input type="checkbox" class="sub-chk" id="chk-b21" checked onclick="toggleSub2('b21',event)">
+        <span class="sub-badge" style="background:var(--amber)">B2.1</span>
+        <span class="sub-title">AI Audio Personalization — ElevenLabs</span>
+        <span class="sub-total" style="background:var(--b-light);color:var(--amber)" id="sst-b21">$0</span>
+        <span class="chevron" style="color:#555">▾</span>
+      </div>
+      <div class="sub-body" id="body-b21">
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Gross revenue — AI Audio</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 27/28: '$0.6–0.9M/yr CPM uplift + podcast ad rev'. Slide 27: '$1.5–3M/yr full potential'. CPM uplift from personalized audio content + podcast advertising.</div></span>
+            </div>
+            <span class="s-val" id="dv-b21_gross">$750K</span>
+          </div>
+          <input type="range" id="s_b21_gross" min="0" max="4000000" step="50000" value="750000" oninput="upd('b21_gross',this.value);calc()">
+          <div class="s-range"><span>$0</span><span>$4M / yr</span></div>
+        </div>
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Implementation cost — ElevenLabs API</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 27/28: '~$35K/yr API cost at SI's scale'. ElevenLabs enterprise publisher tier pricing (publisher license). API cost negligible vs revenue at scale — ~97% margin.</div></span>
+            </div>
+            <span class="s-val" id="dv-b21_cost">$35K</span>
+          </div>
+          <input type="range" id="s_b21_cost" min="0" max="500000" step="5000" value="35000" oninput="upd('b21_cost',this.value);calc()">
+          <div class="s-range"><span>$0</span><span>$500K / yr</span></div>
+        </div>
+        <div class="computed-row">
+          <div>
+            <div class="cr-label">Net margin (auto-computed)</div>
+            <div class="cr-formula">(Gross − Cost) ÷ Gross</div>
+          </div>
+          <div class="cr-val" id="out-b21-margin">—</div>
+        </div>
+        <div class="outputs sec-b">
+          <div class="out-pill"><div class="op-lbl">B2.1 Net Revenue / yr</div><div class="op-val" id="op-b21-net">—</div></div>
+        </div>
+      </div>
+    </div><!-- /sub-b21 -->
+
+    <!-- B2.2: AI Visual -->
+    <div class="sub-card sub-b" id="sub-b22">
+      <div class="sub-head" onclick="toggleSub('sub-b22',event)">
+        <input type="checkbox" class="sub-chk" id="chk-b22" checked onclick="toggleSub2('b22',event)">
+        <span class="sub-badge" style="background:var(--amber)">B2.2</span>
+        <span class="sub-title">AI Visual + Live Coverage — WSC Sports / Magnifi</span>
+        <span class="sub-total" style="background:var(--b-light);color:var(--amber)" id="sst-b22">$0</span>
+        <span class="chevron" style="color:#555">▾</span>
+      </div>
+      <div class="sub-body" id="body-b22">
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Gross revenue — AI Visual + Live</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 27/28: '$2–4M/yr video CPM + session lift'. WSC Sports / LaLiga Case Study 2024. AI highlights, IBM Watson-style live hub. Video CPM uplift + session length lift.</div></span>
+            </div>
+            <span class="s-val" id="dv-b22_gross">$3.0M</span>
+          </div>
+          <input type="range" id="s_b22_gross" min="0" max="6000000" step="100000" value="3000000" oninput="upd('b22_gross',this.value);calc()">
+          <div class="s-range"><span>$0</span><span>$6M / yr</span></div>
+        </div>
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Implementation cost — platform / licensing</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 28: 'Magnifi near-zero marginal'. WSC Sports licensing + integration ~$500K/yr. Auto-computed: '~85% margin (Magnifi near-zero marginal)'.</div></span>
+            </div>
+            <span class="s-val" id="dv-b22_cost">$500K</span>
+          </div>
+          <input type="range" id="s_b22_cost" min="0" max="2000000" step="25000" value="500000" oninput="upd('b22_cost',this.value);calc()">
+          <div class="s-range"><span>$0</span><span>$2M / yr</span></div>
+        </div>
+        <div class="computed-row">
+          <div>
+            <div class="cr-label">Net margin (auto-computed)</div>
+            <div class="cr-formula">(Gross − Cost) ÷ Gross</div>
+          </div>
+          <div class="cr-val" id="out-b22-margin">—</div>
+        </div>
+        <div class="outputs sec-b">
+          <div class="out-pill"><div class="op-lbl">B2.2 Net Revenue / yr</div><div class="op-val" id="op-b22-net">—</div></div>
+        </div>
+      </div>
+    </div><!-- /sub-b22 -->
+
+  </div>
+</div><!-- /sec-b -->
+
+<div class="connector"><span class="arr">↓</span>B auth audience unlocks C partnership revenue</div>
+
+<!-- ████ SECTION C ████ -->
+<div class="sec-card sec-c" id="card-c">
+  <div class="sec-head" onclick="toggleCard('card-c',event)">
+    <input type="checkbox" class="sec-chk" id="chk-c" checked onclick="toggleSection('c',event)">
+    <div class="badge" style="font-size:.7rem">C</div>
+    <div class="sec-label">
+      <strong>Partnerships — AI Licensing · Paywall · Commerce</strong>
+      <span>C1 Licensing · C2 Paywall · C3 Commerce Affiliate</span>
+    </div>
+    <div class="sec-total" id="st-c">$0</div>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sec-body">
+
+    <!-- C1: AI Licensing -->
+    <div class="sub-card sub-c" id="sub-c1">
+      <div class="sub-head" onclick="toggleSub('sub-c1',event)">
+        <input type="checkbox" class="sub-chk" id="chk-c1" checked onclick="toggleSub2('c1',event)">
+        <span class="sub-badge">C1</span>
+        <span class="sub-title">AI Licensing — SI + FanSided + Sports Reference Bundle</span>
+        <span class="sub-total" id="sst-c1">$0</span>
+        <span class="chevron" style="color:#555">▾</span>
+      </div>
+      <div class="sub-body" id="body-c1">
+        <div class="static-row">
+          <span>Licensable articles in bundle (fixed)
+            <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 31: '1.53M SI articles + 2.42M FanSided + Sports Reference historical stats'. Fixed content pool — represents the IP bundle value.</div></span>
+          </span>
+          <span class="sr-val">3.95M articles</span>
+        </div>
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">Gross licensing pool (total deal value)</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 34: 'Revenue Target: Up to $8M'. Slide 31: market proof — premium articles from publisher co-ops. 'Up to $8M annual revenue potential'.</div></span>
+            </div>
+            <span class="s-val" id="dv-licensing_pool">$8.0M</span>
+          </div>
+          <input type="range" id="s_licensing_pool" min="500000" max="20000000" step="250000" value="8000000" oninput="upd('licensing_pool',this.value);calc()">
+          <div class="s-range"><span>$500K</span><span>$20M / yr gross</span></div>
+        </div>
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">SI revenue share rate</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 31: '50% revenue share on AI citations'. Range 40–60% depending on deal structure. Base: $8M × 50% = $4M SI share.</div></span>
+            </div>
+            <span class="s-val" id="dv-rev_share">50%</span>
+          </div>
+          <input type="range" id="s_rev_share" min="10" max="80" step="5" value="50" oninput="upd('rev_share',this.value);calc()">
+          <div class="s-range"><span>10%</span><span>80%</span></div>
+        </div>
+        <div class="outputs sec-c">
+          <div class="out-pill"><div class="op-lbl">C1 AI Licensing / yr</div><div class="op-val" id="op-c1">—</div></div>
+        </div>
+      </div>
+    </div><!-- /sub-c1 -->
+
+    <!-- C2: Partnership Paywall -->
+    <div class="sub-card sub-c" id="sub-c2">
+      <div class="sub-head" onclick="toggleSub('sub-c2',event)">
+        <input type="checkbox" class="sub-chk" id="chk-c2" checked onclick="toggleSub2('c2',event)">
+        <span class="sub-badge">C2</span>
+        <span class="sub-title">Partnership Paywall — Bundle Distribution + Direct SI+</span>
+        <span class="sub-total" id="sst-c2">$0</span>
+        <span class="chevron" style="color:#555">▾</span>
+      </div>
+      <div class="sub-body" id="body-c2">
+
+        <div class="plat-divider">
+          <input type="checkbox" class="sub-chk" id="chk-c2p1" checked onclick="togglePlatform('c2p1',event)"> Phase 1 — Bundle Distribution (Apple News+ / Condé Nast)
+        </div>
+        <div id="body-c2p1">
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Attributed bundle readers</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 32: '200K attributed readers'. Slide 34 target. Y1 ramp: 50K–200K depending on deal timing. SI content readers within partner bundle.</div></span>
+              </div>
+              <span class="s-val" id="dv-c2_readers">100K</span>
+            </div>
+            <input type="range" id="s_c2_readers" min="5000" max="500000" step="5000" value="100000" oninput="upd('c2_readers',this.value);calc()">
+            <div class="s-range"><span>5K</span><span>500K readers</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Bundle subscriber price ($/reader/mo)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 32: Phase 1 rev-share — 40–60% of $4–8/mo bundle price attributable to SI content. Apple News+ / Condé Nast bundle effective value per subscriber.</div></span>
+              </div>
+              <span class="s-val" id="dv-c2_price">$5.00</span>
+            </div>
+            <input type="range" id="s_c2_price" min="1" max="15" step="0.5" value="5" oninput="upd('c2_price',this.value);calc()">
+            <div class="s-range"><span>$1</span><span>$15 / reader / mo</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Revenue share to SI</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 32: '40–60% rev-share on attributed subscribers'. Condé Nast / Apple News+ revenue share model.</div></span>
+              </div>
+              <span class="s-val" id="dv-c2_share">50%</span>
+            </div>
+            <input type="range" id="s_c2_share" min="10" max="80" step="5" value="50" oninput="upd('c2_share',this.value);calc()">
+            <div class="s-range"><span>10%</span><span>80%</span></div>
+          </div>
+          <div class="outputs sec-c">
+            <div class="out-pill"><div class="op-lbl">Phase 1 Bundle / yr</div><div class="op-val" id="op-c2p1">—</div></div>
+          </div>
+        </div>
+
+        <div class="plat-divider">
+          <input type="checkbox" class="sub-chk" id="chk-c2p2" checked onclick="togglePlatform('c2p2',event)"> Phase 2 — Direct Paywall (SI+ $6–$10/mo, 100% margin)
+        </div>
+        <div id="body-c2p2">
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Bundle-to-direct conversion rate</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 32: '20–30% of bundle base converts to direct over 3–5 years'. Comscore CAC by 20–30%. Auth users from B1 provide the warmer pool for direct paywall upsell.</div></span>
+              </div>
+              <span class="s-val" id="dv-c2_conversion">25%</span>
+            </div>
+            <input type="range" id="s_c2_conversion" min="1" max="60" step="1" value="25" oninput="upd('c2_conversion',this.value);calc()">
+            <div class="s-range"><span>1%</span><span>60%</span></div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Direct subscription price (SI+ / mo)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 34: 'SI+ $6–$10/mo, 3–5 yr ramp'. 100% margin at direct stage. Slide 32: 'Target: $2–5M ARR at maturity'. ARR at maturity (100% margin): $2–5M.</div></span>
+              </div>
+              <span class="s-val" id="dv-c2_direct_price">$8.00</span>
+            </div>
+            <input type="range" id="s_c2_direct_price" min="3" max="20" step="0.5" value="8" oninput="upd('c2_direct_price',this.value);calc()">
+            <div class="s-range"><span>$3</span><span>$20 / mo</span></div>
+          </div>
+          <div class="computed-row">
+            <div>
+              <div class="cr-label">Direct subscribers (computed)</div>
+              <div class="cr-formula">bundle_readers × conversion rate</div>
+            </div>
+            <div class="cr-val" id="out-c2-subs">—</div>
+          </div>
+          <div class="outputs sec-c">
+            <div class="out-pill"><div class="op-lbl">Phase 2 Direct ARR / yr</div><div class="op-val" id="op-c2p2">—</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /sub-c2 -->
+
+    <!-- C3: Commerce Affiliate -->
+    <div class="sub-card sub-c" id="sub-c3">
+      <div class="sub-head" onclick="toggleSub('sub-c3',event)">
+        <input type="checkbox" class="sub-chk" id="chk-c3" checked onclick="toggleSub2('c3',event)">
+        <span class="sub-badge">C3</span>
+        <span class="sub-title">Commerce Affiliate — Sportsbook + Gear/Commerce</span>
+        <span class="sub-total" id="sst-c3">$0</span>
+        <span class="chevron" style="color:#555">▾</span>
+      </div>
+      <div class="sub-body" id="body-c3">
+
+        <div class="static-row">
+          <span>Total monthly visitors (SI + FanSided network, fixed)
+            <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 33/34: '90M monthly visitors' SI + FanSided. Used as base for all affiliate calculations. Fixed benchmark.</div></span>
+          </span>
+          <span class="sr-val">90M</span>
+        </div>
+
+        <div class="plat-divider">
+          <input type="checkbox" class="sub-chk" id="chk-sports" checked onclick="togglePlatform('sports',event)"> Sportsbook Engine — DraftKings · BetMGM · Polymarket
+        </div>
+        <div id="body-sports">
+          <div class="static-row">
+            <span>Bettor overlap (fixed — FanSided declared data)
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 33: '25% bettor overlap'. FanSided declared fan data pre-qualifies betting audience. Fixed benchmark.</div></span>
+            </span>
+            <span class="sr-val">25% → 22.5M qualifying</span>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Effective bettor acquisition rate</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 33: 'Proven CTR 1–2%'. Effective rate = CTR × click-to-deposit conversion (~1–3%). Action Network generates ~$40M/yr on similar model. Y1 target: $2–4M.</div></span>
+              </div>
+              <span class="s-val" id="dv-acq_rate">0.020%</span>
+            </div>
+            <input type="range" id="s_acq_rate" min="0.005" max="0.1" step="0.005" value="0.02" oninput="upd('acq_rate',this.value);calc()">
+            <div class="s-range"><span>0.005%</span><span>0.1%</span></div>
+            <div class="note">% of qualifying visitors who deposit (widget CTR × click-to-deposit conversion)</div>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">CPA per acquired bettor</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 33: '~$50 CPA'. Action Network generates ~$40M/yr on similar model. SI earns per depositing user referred to sportsbook partner.</div></span>
+              </div>
+              <span class="s-val" id="dv-cpa">$50</span>
+            </div>
+            <input type="range" id="s_cpa" min="10" max="150" step="5" value="50" oninput="upd('cpa',this.value);calc()">
+            <div class="s-range"><span>$10</span><span>$150 / acquisition</span></div>
+          </div>
+          <div class="outputs sec-c">
+            <div class="out-pill"><div class="op-lbl">Sportsbook / yr</div><div class="op-val" id="op-sports">—</div></div>
+          </div>
+        </div>
+
+        <div class="plat-divider">
+          <input type="checkbox" class="sub-chk" id="chk-gear" checked onclick="togglePlatform('gear',event)"> Gear / Commerce — Dick's · Nike · REI · Fanatics
+        </div>
+        <div id="body-gear">
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Gear purchase conversion rate</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 33: 'Conservative Y1 model assumes 0.1% gear conversion on existing traffic'. Dick's, Nike, REI, Fanatics. Y1 target $4.5–10M.</div></span>
+              </div>
+              <span class="s-val" id="dv-gear_conv">0.10%</span>
+            </div>
+            <input type="range" id="s_gear_conv" min="0.01" max="0.5" step="0.01" value="0.1" oninput="upd('gear_conv',this.value);calc()">
+            <div class="s-range"><span>0.01%</span><span>0.5%</span></div>
+          </div>
+          <div class="static-row">
+            <span>Average order value (jersey, equipment, team shop)
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 33: '$100 avg order'. Dick's, Nike, REI, Fanatics. Jersey ~$100–150, equipment $50–300.</div></span>
+            </span>
+            <span class="sr-val">$100</span>
+          </div>
+          <div class="srow">
+            <div class="srow-top">
+              <div class="s-label-wrap">
+                <span class="s-label">Commission rate (% of order value)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 33/34: '5–12% commission'. Dick's Sporting Goods / Nike affiliate programs: 5–10%.</div></span>
+              </div>
+              <span class="s-val" id="dv-gear_commission">7%</span>
+            </div>
+            <input type="range" id="s_gear_commission" min="1" max="20" step="1" value="7" oninput="upd('gear_commission',this.value);calc()">
+            <div class="s-range"><span>1%</span><span>20%</span></div>
+          </div>
+          <div class="outputs sec-c">
+            <div class="out-pill"><div class="op-lbl">Gear/Commerce / yr</div><div class="op-val" id="op-gear">—</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /sub-c3 -->
+
+  </div>
+</div><!-- /sec-c -->
+
+</div><!-- /inputs-panel -->
+
+<!-- ══════════════════ CHARTS PANEL ══════════════════ -->
+<div class="charts-panel">
+
+  <div class="total-box">
+    <div class="tb-left">
+      <div class="tb-label">Total Year 1 Revenue</div>
+      <div class="tb-val" id="big-total">—</div>
+      <div style="color:#888;font-size:.68rem;margin-top:2px">All enabled streams combined</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-sub">vs. $27.1M base target</div>
+      <div class="range-bar"><div class="rb-fill" id="range-fill" style="width:5%"></div></div>
+      <div style="color:#666;font-size:.66rem;margin-top:3px;text-align:right" id="range-pct">—</div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="flex:1;min-height:200px;display:flex;flex-direction:column">
+    <h3>Revenue Breakdown — Live</h3>
+    <div style="flex:1;position:relative;min-height:0">
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Contribution to Total</h3>
+    <div class="contrib-list">
+      <div class="cr-row"><span class="crl">A1 · AI Citation</span><div class="crb-wrap"><div class="crb" id="cb-a1" style="background:#1C2C6B;width:0%"></div></div><span class="crv" id="cv-a1" style="color:#1C2C6B">—</span></div>
+      <div class="cr-row"><span class="crl">A2 · Social</span><div class="crb-wrap"><div class="crb" id="cb-a2" style="background:#2563EB;width:0%"></div></div><span class="crv" id="cv-a2" style="color:#2563EB">—</span></div>
+      <div class="cr-row"><span class="crl">B1 · Auth CPM</span><div class="crb-wrap"><div class="crb" id="cb-b1" style="background:#B45309;width:0%"></div></div><span class="crv" id="cv-b1" style="color:#B45309">—</span></div>
+      <div class="cr-row"><span class="crl">B2.1 · AI Audio</span><div class="crb-wrap"><div class="crb" id="cb-b21" style="background:#D97706;width:0%"></div></div><span class="crv" id="cv-b21" style="color:#D97706">—</span></div>
+      <div class="cr-row"><span class="crl">B2.2 · AI Visual</span><div class="crb-wrap"><div class="crb" id="cb-b22" style="background:#F59E0B;width:0%"></div></div><span class="crv" id="cv-b22" style="color:#F59E0B">—</span></div>
+      <div class="cr-row"><span class="crl">C1 · AI Licensing</span><div class="crb-wrap"><div class="crb" id="cb-c1" style="background:#0D7377;width:0%"></div></div><span class="crv" id="cv-c1" style="color:#0D7377">—</span></div>
+      <div class="cr-row"><span class="crl">C2 · Paywall</span><div class="crb-wrap"><div class="crb" id="cb-c2" style="background:#0E9EA6;width:0%"></div></div><span class="crv" id="cv-c2" style="color:#0E9EA6">—</span></div>
+      <div class="cr-row"><span class="crl">C3 · Commerce</span><div class="crb-wrap"><div class="crb" id="cb-c3" style="background:#5B21B6;width:0%"></div></div><span class="crv" id="cv-c3" style="color:#5B21B6">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="flex-shrink:0">
+    <h3>Scenario Comparison</h3>
+    <div style="position:relative;height:120px">
+      <canvas id="scenChart"></canvas>
+    </div>
+  </div>
+
+  <div class="synergy">
+    <strong>THE MODEL: </strong>
+    A brings traffic &nbsp;→&nbsp; <strong>B</strong> converts to owned users &nbsp;→&nbsp; <strong>C</strong> monetizes that relationship<br>
+    <span style="font-size:.68rem;color:#718096">Toggle any section off to model a focused scenario</span>
+  </div>
+
+</div><!-- /charts-panel -->
+</div><!-- /layout -->
 
 <script>
-// ── C2 implementation configs ────────────────────────────────────────────────
-const C2_IMPL = {
-  wsc: {
-    rev_default: 3000000, rev_min: 500000,   rev_max: 6000000,
-    cost_default: 500000, cost_min: 100000,  cost_max: 2000000,
-    rev_range: '$500K — $6M / yr', cost_range: '$100K — $2M / yr',
-    rev_note:   'Video CPM uplift + session lift from AI highlights and IBM Watson-style live hub.',
-    cost_note:  'WSC Sports licensing + integration / setup costs.',
-    desc: 'WSC Sports partnership: AI highlights, IBM Watson-style live hub. Revenue potential $2–4M/yr but requires a licensing deal.'
-  },
-  magnifi: {
-    rev_default: 800000,  rev_min: 0,        rev_max: 2000000,
-    cost_default: 20000,  cost_min: 0,       cost_max: 150000,
-    rev_range: '$0 — $2M / yr', cost_range: '$0 — $150K / yr',
-    rev_note:   'Video CPM uplift using Magnifi, already live in MM stack. Lower ceiling but near-zero incremental cost.',
-    cost_note:  'Minimal operational cost — Magnifi is already integrated into the MM platform.',
-    desc: 'Magnifi is already live in the MM stack — near-zero marginal cost. Lower revenue ceiling but essentially free to activate.'
-  }
-};
+// ── Tooltip system ────────────────────────────────────────────────────────────
+function toggleTip(btn) {
+  const tip = btn.nextElementSibling;
+  const wasOpen = tip.classList.contains('open');
+  document.querySelectorAll('.tooltip.open').forEach(t => t.classList.remove('open'));
+  if (!wasOpen) { tip.classList.add('open'); event.stopPropagation(); }
+}
+document.addEventListener('click', () => document.querySelectorAll('.tooltip.open').forEach(t => t.classList.remove('open')));
 
-function setC2Impl(mode, applyDefaults = true) {
-  const cfg = C2_IMPL[mode];
-  const sRev  = document.getElementById('s_c2_rev');
-  const sCost = document.getElementById('s_c2_cost');
-  // Update ranges
-  sRev.min  = cfg.rev_min;  sRev.max  = cfg.rev_max;
-  sCost.min = cfg.cost_min; sCost.max = cfg.cost_max;
-  // Apply defaults if requested
-  if (applyDefaults) {
-    sRev.value  = cfg.rev_default;
-    sCost.value = cfg.cost_default;
-    updateDisplay('c2_rev',  cfg.rev_default);
-    updateDisplay('c2_cost', cfg.cost_default);
-  }
-  // Update labels
-  const rrEl = document.getElementById('c2_rev_range');
-  const crEl = document.getElementById('c2_cost_range');
-  if (rrEl) rrEl.innerHTML = '<span>' + cfg.rev_range.split('—')[0].trim() + '</span><span>' + cfg.rev_range.split('—')[1].trim() + '</span>';
-  if (crEl) crEl.innerHTML = '<span>' + cfg.cost_range.split('—')[0].trim() + '</span><span>' + cfg.cost_range.split('—')[1].trim() + '</span>';
-  document.getElementById('c2_rev_note').textContent  = cfg.rev_note;
-  document.getElementById('c2_cost_note').textContent = cfg.cost_note;
-  document.getElementById('c2_impl_desc').textContent = cfg.desc;
+// ── Card / sub-card toggle ────────────────────────────────────────────────────
+function toggleCard(id, e) {
+  if (e && (e.target.type === 'checkbox' || e.target.classList.contains('info-btn'))) return;
+  document.getElementById(id).classList.toggle('collapsed');
+}
+function toggleSub(id, e) {
+  if (e && (e.target.type === 'checkbox' || e.target.classList.contains('info-btn'))) return;
+  document.getElementById(id).classList.toggle('sub-collapsed');
+}
+
+// ── Section-level checkbox (enables/disables all children) ────────────────────
+function toggleSection(sec, e) {
+  e.stopPropagation();
+  const on = document.getElementById('chk-'+sec).checked;
+  // find all sub-checkboxes and platform checkboxes inside the section card
+  const card = document.getElementById('card-'+sec);
+  card.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    if (cb.id !== 'chk-'+sec) {
+      cb.checked = on;
+      cb.disabled = !on;
+    }
+  });
+  card.querySelectorAll('.sub-body, [id^="body-"]').forEach(el => {
+    el.classList.toggle('disabled-section', !on);
+  });
   calc();
 }
 
-// ── Scenario presets ─────────────────────────────────────────────────────────
+// ── Sub-section checkbox ──────────────────────────────────────────────────────
+function toggleSub2(key, e) {
+  e.stopPropagation();
+  const on = document.getElementById('chk-'+key).checked;
+  const body = document.getElementById('body-'+key);
+  if (body) body.classList.toggle('disabled-section', !on);
+  calc();
+}
+
+// ── Platform checkbox ─────────────────────────────────────────────────────────
+function togglePlatform(key, e) {
+  e.stopPropagation();
+  const on = document.getElementById('chk-'+key).checked;
+  const body = document.getElementById('body-'+key);
+  if (body) body.classList.toggle('disabled-section', !on);
+  calc();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+function gv(id) { return parseFloat($('s_'+id)?.value) || 0; }
+function chk(id) { const el = $('chk-'+id); return el ? el.checked : false; }
+function setEl(id, v) { const e = $(id); if (e) e.textContent = v; }
+
+function fmtBig(n) {
+  if (Math.abs(n) >= 1e9) return '$'+(n/1e9).toFixed(2)+'B';
+  if (Math.abs(n) >= 1e6) return '$'+(n/1e6).toFixed(2)+'M';
+  if (Math.abs(n) >= 1e3) return '$'+Math.round(n/1000)+'K';
+  return '$'+Math.round(n).toLocaleString();
+}
+function fmtNum(n) {
+  if (Math.abs(n) >= 1e9) return (n/1e9).toFixed(1)+'B';
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if (Math.abs(n) >= 1e3) return (n/1000).toFixed(0)+'K';
+  return Math.round(n).toLocaleString();
+}
+
+// ── Display formatters ────────────────────────────────────────────────────────
+const FMT = {
+  citation_rate: v => Math.round(v)+' / 1k',
+  site_rpm:      v => '$'+parseFloat(v).toFixed(0),
+  social_ctr:    v => parseFloat(v).toFixed(1)+'%',
+  yt_views:      v => parseFloat(v).toFixed(1)+'M',
+  yt_rpm:        v => '$'+parseFloat(v).toFixed(2),
+  yt_deals:      v => Math.round(v),
+  yt_deal_val:   v => '$'+parseInt(v).toLocaleString(),
+  tt_views:      v => Math.round(v)+'M',
+  tt_rpm:        v => '$'+parseFloat(v).toFixed(2),
+  tt_deals:      v => Math.round(v),
+  tt_deal_val:   v => '$'+parseInt(v).toLocaleString(),
+  ig_posts:      v => Math.round(v),
+  ig_val:        v => '$'+parseInt(v).toLocaleString(),
+  tw_impr:       v => Math.round(v)+'M',
+  tw_rpm:        v => '$'+parseFloat(v).toFixed(2),
+  tw_deals:      v => Math.round(v),
+  tw_deal_val:   v => '$'+parseInt(v).toLocaleString(),
+  base_visitors: v => fmtNum(parseFloat(v)),
+  auth_rate:     v => parseFloat(v).toFixed(1)+'%',
+  anon_cpm:      v => '$'+parseFloat(v).toFixed(2),
+  auth_cpm:      v => '$'+parseFloat(v).toFixed(2),
+  b21_gross:     v => fmtBig(parseFloat(v)),
+  b21_cost:      v => fmtBig(parseFloat(v)),
+  b22_gross:     v => fmtBig(parseFloat(v)),
+  b22_cost:      v => fmtBig(parseFloat(v)),
+  licensing_pool:v => fmtBig(parseFloat(v)),
+  rev_share:     v => Math.round(v)+'%',
+  c2_readers:    v => fmtNum(parseFloat(v)),
+  c2_price:      v => '$'+parseFloat(v).toFixed(2),
+  c2_share:      v => Math.round(v)+'%',
+  c2_conversion: v => Math.round(v)+'%',
+  c2_direct_price:v=> '$'+parseFloat(v).toFixed(2),
+  acq_rate:      v => parseFloat(v).toFixed(3)+'%',
+  cpa:           v => '$'+Math.round(v),
+  gear_conv:     v => parseFloat(v).toFixed(2)+'%',
+  gear_commission:v=> Math.round(v)+'%',
+};
+function upd(id, v) {
+  const el = $('dv-'+id);
+  if (el && FMT[id]) el.textContent = FMT[id](v);
+}
+
+// ── Scenario presets ──────────────────────────────────────────────────────────
 const SC = {
-  low:  { impressions:100,  ctr:7.5,  base_visitors:20000000, auth_rate:5,   visits:4, cpm:6,
-          c1_rev:1500000, c1_cost:35000,
-          c2_rev:800000,  c2_cost:20000,  c2_impl:'magnifi' },
-  base: { impressions:400,  ctr:15,   base_visitors:29000000, auth_rate:7.5, visits:4, cpm:8.5,
-          c1_rev:2250000, c1_cost:35000,
-          c2_rev:3000000, c2_cost:500000, c2_impl:'wsc' },
-  high: { impressions:800,  ctr:25,   base_visitors:35000000, auth_rate:10,  visits:4, cpm:11,
-          c1_rev:3000000, c1_cost:35000,
-          c2_rev:4000000, c2_cost:500000, c2_impl:'wsc' },
+  low: {
+    citation_rate:10, site_rpm:15, social_ctr:0.5,
+    yt_views:1.5, yt_rpm:3, yt_deals:1, yt_deal_val:4000,
+    tt_views:10, tt_rpm:0.4, tt_deals:2, tt_deal_val:3500,
+    ig_posts:3, ig_val:4000,
+    tw_impr:15, tw_rpm:0.1, tw_deals:1, tw_deal_val:500,
+    base_visitors:20000000, auth_rate:5, anon_cpm:2, auth_cpm:8,
+    b21_gross:600000, b21_cost:35000,
+    b22_gross:800000, b22_cost:20000,
+    licensing_pool:3000000, rev_share:40,
+    c2_readers:50000, c2_price:4, c2_share:40, c2_conversion:20, c2_direct_price:6,
+    acq_rate:0.013, cpa:50,
+    gear_conv:0.08, gear_commission:5,
+  },
+  base: {
+    citation_rate:20, site_rpm:20, social_ctr:1,
+    yt_views:4, yt_rpm:5, yt_deals:2, yt_deal_val:6000,
+    tt_views:20, tt_rpm:0.7, tt_deals:4, tt_deal_val:5000,
+    ig_posts:5, ig_val:8000,
+    tw_impr:28, tw_rpm:0.2, tw_deals:2, tw_deal_val:2000,
+    base_visitors:29000000, auth_rate:7.5, anon_cpm:3, auth_cpm:11.5,
+    b21_gross:750000, b21_cost:35000,
+    b22_gross:3000000, b22_cost:500000,
+    licensing_pool:8000000, rev_share:50,
+    c2_readers:100000, c2_price:5, c2_share:50, c2_conversion:25, c2_direct_price:8,
+    acq_rate:0.02, cpa:50,
+    gear_conv:0.1, gear_commission:7,
+  },
+  high: {
+    citation_rate:30, site_rpm:30, social_ctr:1.5,
+    yt_views:8, yt_rpm:7, yt_deals:4, yt_deal_val:8000,
+    tt_views:30, tt_rpm:1.0, tt_deals:6, tt_deal_val:7000,
+    ig_posts:6, ig_val:12000,
+    tw_impr:40, tw_rpm:0.3, tw_deals:3, tw_deal_val:3500,
+    base_visitors:35000000, auth_rate:10, anon_cpm:4, auth_cpm:15,
+    b21_gross:1500000, b21_cost:35000,
+    b22_gross:4000000, b22_cost:500000,
+    licensing_pool:14000000, rev_share:60,
+    c2_readers:200000, c2_price:8, c2_share:60, c2_conversion:30, c2_direct_price:10,
+    acq_rate:0.03, cpa:50,
+    gear_conv:0.11, gear_commission:9,
+  },
 };
 
 function applyScenario(name) {
@@ -536,196 +1182,255 @@ function applyScenario(name) {
   document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector('.sc-btn.'+name);
   if (btn) btn.classList.add('active');
-  // Set C2 implementation first (adjusts slider ranges), without applying defaults
-  if (d.c2_impl) {
-    document.getElementById('c2_impl').value = d.c2_impl;
-    setC2Impl(d.c2_impl, false);
-  }
-  // Then set all slider values
   Object.entries(d).forEach(([k,v]) => {
-    if (k === 'c2_impl') return;
-    const s = document.getElementById('s_'+k);
-    if (s) { s.value = v; updateDisplay(k, v); }
+    const s = $('s_'+k);
+    if (s) { s.value = v; upd(k, v); }
   });
   calc();
 }
 
-// ── Display formatters ───────────────────────────────────────────────────────
-function fmtBig(n) {
-  if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
-  if (Math.abs(n) >= 1e3) return '$' + Math.round(n/1000) + 'K';
-  return '$' + Math.round(n);
-}
-function fmtNum(n) {
-  if (Math.abs(n) >= 1e9) return (n/1e9).toFixed(1) + 'B';
-  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1) + 'M';
-  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(0) + 'K';
-  return Math.round(n).toLocaleString();
-}
+// ── Charts ────────────────────────────────────────────────────────────────────
+const BAR_LABELS = ['A1 Citation','A2 Social','B1 Auth','B2.1 Audio','B2.2 Visual','C1 License','C2 Paywall','C3 Commerce'];
+const BAR_COLORS = ['#1C2C6B','#2563EB','#B45309','#D97706','#F59E0B','#0D7377','#0E9EA6','#5B21B6'];
 
-function updateDisplay(id, v) {
-  const el = document.getElementById('dv-'+id);
-  if (!el) return;
-  const val = parseFloat(v);
-  const map = {
-    impressions:   () => val + 'M  (' + fmtNum(val * 1e6) + ' total)',
-    ctr:           () => val.toFixed(1) + ' / 1k',
-    base_visitors: () => fmtNum(val),
-    auth_rate:     () => val.toFixed(1) + '%',
-    visits:        () => val.toFixed(1),
-    cpm:           () => '$' + val.toFixed(2),
-    c1_rev:        () => fmtBig(val),
-    c1_cost:       () => fmtBig(val),
-    c2_rev:        () => fmtBig(val),
-    c2_cost:       () => fmtBig(val),
-  };
-  if (map[id]) el.textContent = map[id]();
-}
-
-function gv(id) { return parseFloat(document.getElementById('s_'+id).value) || 0; }
-function setEl(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
-
-// ── Charts ───────────────────────────────────────────────────────────────────
-const barCtx = document.getElementById('barChart').getContext('2d');
+const barCtx = $('barChart').getContext('2d');
 const barChart = new Chart(barCtx, {
-  type: 'bar',
-  data: {
-    labels: ['Auth CPM (B)', 'AI Audio (C1)', 'AI Visual (C2)'],
-    datasets: [{ data: [0,0,0], backgroundColor: ['#B45309','#0D7377','#1C2C6B'], borderRadius: 6, borderSkipped: false }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false, animation: { duration: 280 },
-    plugins: {
-      legend: { display: false },
-      tooltip: { callbacks: { label: ctx => ' ' + fmtBig(ctx.parsed.y) + ' / yr' } }
-    },
-    scales: {
-      y: { beginAtZero: true, ticks: { callback: v => fmtBig(v), font: { size: 10 } }, grid: { color: '#F0F0F0' } },
-      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+  type:'bar',
+  data:{ labels:BAR_LABELS, datasets:[{ data:[0,0,0,0,0,0,0,0], backgroundColor:BAR_COLORS, borderRadius:5, borderSkipped:false }] },
+  options:{
+    responsive:true, maintainAspectRatio:false, animation:{duration:250},
+    plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>' '+fmtBig(c.parsed.y)+' / yr'}} },
+    scales:{
+      y:{beginAtZero:true, ticks:{callback:v=>fmtBig(v),font:{size:9}}, grid:{color:'#F0F0F0'}},
+      x:{grid:{display:false}, ticks:{font:{size:8},maxRotation:30}}
     }
   }
 });
 
-function calcScenario(sc) {
+function calcScen(sc) {
   const d = SC[sc];
-  const newVis  = d.impressions * d.ctr * 1000;
-  const authRev = (d.base_visitors + newVis) * (d.auth_rate/100) * d.visits * d.cpm / 1000 * 12;
-  return { authRev, c1: d.c1_rev - d.c1_cost, c2: d.c2_rev - d.c2_cost };
+  const a1v = 400e6*(d.citation_rate/1000)*0.015;
+  const a1 = a1v*d.site_rpm/1000*12;
+  const a2 = ((d.yt_views*1e6*d.yt_rpm/1000+d.yt_deals*d.yt_deal_val)+
+               (d.tt_views*1e6*d.tt_rpm/1000+d.tt_deals*d.tt_deal_val)+
+               (d.ig_posts*d.ig_val)+
+               (d.tw_impr*1e6*d.tw_rpm/1000+d.tw_deals*d.tw_deal_val))*12;
+  const refVis = (d.yt_views+d.tt_views+d.tw_impr)*1e6*d.social_ctr/100;
+  const totVis = d.base_visitors+a1v+refVis;
+  const b1 = totVis*(d.auth_rate/100)*4*(d.auth_cpm-d.anon_cpm)/1000*12;
+  const b21 = d.b21_gross-d.b21_cost;
+  const b22 = d.b22_gross-d.b22_cost;
+  const c1 = d.licensing_pool*d.rev_share/100;
+  const c2p1 = d.c2_readers*d.c2_price*(d.c2_share/100)*12;
+  const c2p2 = d.c2_readers*(d.c2_conversion/100)*d.c2_direct_price*12;
+  const c3s = 90e6*0.25*(d.acq_rate/100)*d.cpa*12;
+  const c3g = 90e6*(d.gear_conv/100)*100*(d.gear_commission/100)*12;
+  return {a1,a2,b1,b21,b22,c1,c2:c2p1+c2p2,c3:c3s+c3g,total:a1+a2+b1+b21+b22+c1+c2p1+c2p2+c3s+c3g};
 }
 
-const scenCtx = document.getElementById('scenChart').getContext('2d');
+const scenCtx = $('scenChart').getContext('2d');
 const scenChart = new Chart(scenCtx, {
-  type: 'bar',
-  data: {
-    labels: ['Low', 'Base', 'High', 'You ▶'],
-    datasets: [
-      { label: 'Auth CPM (B)', data: [0,0,0,0], backgroundColor: '#B45309', borderRadius: [0,0,0,4] },
-      { label: 'AI Audio (C1)', data: [0,0,0,0], backgroundColor: '#0D7377', borderRadius: [0,0,0,4] },
-      { label: 'AI Visual (C2)', data: [0,0,0,0], backgroundColor: '#1C2C6B', borderRadius: [0,0,0,4] },
+  type:'bar',
+  data:{
+    labels:['Low','Base','High','You ▶'],
+    datasets:[
+      {label:'A',data:[0,0,0,0],backgroundColor:'#1C2C6B',borderRadius:[0,0,0,3]},
+      {label:'B',data:[0,0,0,0],backgroundColor:'#B45309',borderRadius:[0,0,0,3]},
+      {label:'C',data:[0,0,0,0],backgroundColor:'#0D7377',borderRadius:[0,0,0,3]},
     ]
   },
-  options: {
-    responsive: true, maintainAspectRatio: false, animation: { duration: 280 },
-    plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 }, padding: 8 } },
-      tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmtBig(ctx.parsed.y) } }
+  options:{
+    responsive:true, maintainAspectRatio:false, animation:{duration:250},
+    plugins:{
+      legend:{position:'bottom',labels:{boxWidth:8,font:{size:8},padding:6}},
+      tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fmtBig(c.parsed.y)}}
     },
-    scales: {
-      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
-      y: { stacked: true, ticks: { callback: v => fmtBig(v), font: { size: 9 } }, grid: { color: '#F0F0F0' } }
+    scales:{
+      x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},
+      y:{stacked:true,ticks:{callback:v=>fmtBig(v),font:{size:8}},grid:{color:'#F0F0F0'}}
     }
   }
 });
 
-['low','base','high'].forEach((sc,i) => {
-  const r = calcScenario(sc);
-  scenChart.data.datasets[0].data[i] = r.authRev;
-  scenChart.data.datasets[1].data[i] = r.c1;
-  scenChart.data.datasets[2].data[i] = r.c2;
+['low','base','high'].forEach((sc,i)=>{
+  const r = calcScen(sc);
+  scenChart.data.datasets[0].data[i] = r.a1+r.a2;
+  scenChart.data.datasets[1].data[i] = r.b1+r.b21+r.b22;
+  scenChart.data.datasets[2].data[i] = r.c1+r.c2+r.c3;
 });
+scenChart.update();
 
-// ── Main calculation ─────────────────────────────────────────────────────────
-const TARGET_LOW = 4200000, TARGET_HIGH = 8400000;
+// ── Main calculation ──────────────────────────────────────────────────────────
+const TARGET = 27137340;
 
 function calc() {
-  // A
-  const newVis  = gv('impressions') * gv('ctr') * 1000;
+  // A1
+  let a1_vis = 0, a1_rev = 0;
+  if (chk('a1')) {
+    a1_vis = 400e6 * (gv('citation_rate')/1000) * 0.015;
+    a1_rev = a1_vis * gv('site_rpm')/1000 * 12;
+  }
 
-  // B
-  const totalVis = gv('base_visitors') + newVis;
-  const authUsers = totalVis * (gv('auth_rate') / 100);
-  const authRev   = authUsers * gv('visits') * gv('cpm') / 1000 * 12;
+  // A2 platforms
+  let a2_yt = 0, a2_tt = 0, a2_ig = 0, a2_tw = 0;
+  if (chk('yt')) a2_yt = (gv('yt_views')*1e6 * gv('yt_rpm')/1000 + gv('yt_deals')*gv('yt_deal_val'))*12;
+  if (chk('tt')) a2_tt = (gv('tt_views')*1e6 * gv('tt_rpm')/1000 + gv('tt_deals')*gv('tt_deal_val'))*12;
+  if (chk('ig')) a2_ig = gv('ig_posts') * gv('ig_val') * 12;
+  if (chk('tw')) a2_tw = (gv('tw_impr')*1e6 * gv('tw_rpm')/1000 + gv('tw_deals')*gv('tw_deal_val'))*12;
+  const a2_rev = chk('a2') ? (a2_yt+a2_tt+a2_ig+a2_tw) : 0;
 
-  // C1 — margin computed from gross & cost
-  const c1Gross  = gv('c1_rev');
-  const c1Cost   = gv('c1_cost');
-  const c1Net    = c1Gross - c1Cost;
-  const c1Margin = c1Gross > 0 ? (c1Net / c1Gross * 100) : 0;
+  // Social referral visitors → B1
+  let ref_vis = 0;
+  if (chk('a2')) {
+    const reach = (chk('yt')?gv('yt_views'):0) + (chk('tt')?gv('tt_views'):0) + (chk('tw')?gv('tw_impr'):0);
+    ref_vis = reach * 1e6 * gv('social_ctr')/100;
+  }
 
-  // C2 — margin computed from gross & cost
-  const c2Gross  = gv('c2_rev');
-  const c2Cost   = gv('c2_cost');
-  const c2Net    = c2Gross - c2Cost;
-  const c2Margin = c2Gross > 0 ? (c2Net / c2Gross * 100) : 0;
+  // B1 Auth Engine
+  let b1_auth = 0, b1_rev = 0, b1_total_vis = 0;
+  if (chk('b1')) {
+    b1_total_vis = gv('base_visitors') + a1_vis + ref_vis;
+    b1_auth = b1_total_vis * gv('auth_rate')/100;
+    const uplift = gv('auth_cpm') - gv('anon_cpm');
+    b1_rev = b1_auth * 4 * uplift/1000 * 12;
+    setEl('out-b1-vis', fmtNum(b1_total_vis));
+    setEl('out-b1-uplift', '$'+uplift.toFixed(2)+' / 1k');
+  } else {
+    setEl('out-b1-vis','—');
+    setEl('out-b1-uplift','—');
+  }
 
-  const total = authRev + c1Net + c2Net;
+  // B2.1
+  let b21_net = 0, b21_margin = 0;
+  if (chk('b21')) {
+    b21_net = gv('b21_gross') - gv('b21_cost');
+    b21_margin = gv('b21_gross') > 0 ? b21_net/gv('b21_gross')*100 : 0;
+  }
+  setEl('out-b21-margin', gv('b21_gross')>0 ? b21_margin.toFixed(1)+'%' : '—');
 
-  // Section header totals
-  setEl('st-a', fmtNum(newVis) + ' new / mo');
-  setEl('st-b', fmtBig(authRev));
-  setEl('st-c', fmtBig(c1Net + c2Net));
+  // B2.2
+  let b22_net = 0, b22_margin = 0;
+  if (chk('b22')) {
+    b22_net = gv('b22_gross') - gv('b22_cost');
+    b22_margin = gv('b22_gross') > 0 ? b22_net/gv('b22_gross')*100 : 0;
+  }
+  setEl('out-b22-margin', gv('b22_gross')>0 ? b22_margin.toFixed(1)+'%' : '—');
 
-  // Output pills
-  setEl('op-new-vis',    fmtNum(newVis));
-  setEl('op-new-vis-yr', fmtNum(newVis * 12));
-  setEl('op-auth-users', fmtNum(authUsers));
-  setEl('op-auth-rev',   fmtBig(authRev));
-  setEl('op-c1-net',     fmtBig(c1Net));
-  setEl('op-c2-net',     fmtBig(c2Net));
+  // C1
+  let c1_rev = 0;
+  if (chk('c1')) c1_rev = gv('licensing_pool') * gv('rev_share')/100;
 
-  // Auto-computed margins
-  setEl('out-c1-margin', c1Margin.toFixed(1) + '%');
-  setEl('out-c2-margin', c2Margin.toFixed(1) + '%');
+  // C2
+  let c2p1_rev = 0, c2p2_rev = 0, c2_subs = 0;
+  if (chk('c2')) {
+    if (chk('c2p1')) c2p1_rev = gv('c2_readers') * gv('c2_price') * gv('c2_share')/100 * 12;
+    if (chk('c2p2')) {
+      c2_subs = gv('c2_readers') * gv('c2_conversion')/100;
+      c2p2_rev = c2_subs * gv('c2_direct_price') * 12;
+    }
+  }
+  setEl('out-c2-subs', c2_subs > 0 ? fmtNum(c2_subs) : '—');
 
-  // Big total
-  setEl('big-total', '~' + fmtBig(total));
-  const bigEl = document.getElementById('big-total');
-  if (bigEl) bigEl.style.color = total > TARGET_HIGH ? '#27AE60' : total < TARGET_LOW ? '#E74C3C' : '#fff';
+  // C3
+  let c3_sports = 0, c3_gear = 0;
+  if (chk('c3')) {
+    if (chk('sports')) c3_sports = 90e6 * 0.25 * gv('acq_rate')/100 * gv('cpa') * 12;
+    if (chk('gear'))   c3_gear   = 90e6 * gv('gear_conv')/100 * 100 * gv('gear_commission')/100 * 12;
+  }
 
-  // Range indicator
-  const rfill = document.getElementById('range-fill');
-  if (rfill) rfill.style.width = Math.min(100, Math.max(5, total / TARGET_HIGH * 100)) + '%';
+  // Totals
+  const a_total = a1_rev + a2_rev;
+  const b_total = b1_rev + b21_net + b22_net;
+  const c_total = c1_rev + c2p1_rev + c2p2_rev + c3_sports + c3_gear;
+  const grand = a_total + b_total + c_total;
+
+  // ── Update outputs ──
+  // A1
+  setEl('out-a1-vis', fmtNum(a1_vis));
+  setEl('op-a1-vis', fmtNum(a1_vis));
+  setEl('op-a1-rev', fmtBig(a1_rev));
+  setEl('sst-a1', fmtBig(a1_rev));
+
+  // A2 platforms
+  setEl('op-yt', fmtBig(a2_yt));
+  setEl('op-tt', fmtBig(a2_tt));
+  setEl('op-ig', fmtBig(a2_ig));
+  setEl('op-tw', fmtBig(a2_tw));
+  setEl('op-a2-ref', fmtNum(ref_vis)+' / mo');
+  setEl('op-a2-rev', fmtBig(a2_rev));
+  setEl('sst-a2', fmtBig(a2_rev));
+
+  // Section A
+  setEl('st-a', fmtBig(a_total));
+
+  // B1
+  setEl('op-b1-auth', fmtNum(b1_auth));
+  setEl('op-b1-rev', fmtBig(b1_rev));
+  setEl('sst-b1', fmtBig(b1_rev));
+
+  // B2.1
+  setEl('op-b21-net', fmtBig(b21_net));
+  setEl('sst-b21', fmtBig(b21_net));
+
+  // B2.2
+  setEl('op-b22-net', fmtBig(b22_net));
+  setEl('sst-b22', fmtBig(b22_net));
+
+  // Section B
+  setEl('st-b', fmtBig(b_total));
+
+  // C1
+  setEl('op-c1', fmtBig(c1_rev));
+  setEl('sst-c1', fmtBig(c1_rev));
+
+  // C2
+  setEl('op-c2p1', fmtBig(c2p1_rev));
+  setEl('op-c2p2', fmtBig(c2p2_rev));
+  setEl('sst-c2', fmtBig(c2p1_rev+c2p2_rev));
+
+  // C3
+  setEl('op-sports', fmtBig(c3_sports));
+  setEl('op-gear', fmtBig(c3_gear));
+  setEl('sst-c3', fmtBig(c3_sports+c3_gear));
+
+  // Section C
+  setEl('st-c', fmtBig(c_total));
+
+  // Grand total
+  setEl('big-total', '~'+fmtBig(grand));
+  const bigEl = $('big-total');
+  if (bigEl) bigEl.style.color = grand >= TARGET*1.1 ? '#27AE60' : grand < TARGET*0.5 ? '#E74C3C' : '#fff';
+
+  // Range bar
+  const rfill = $('range-fill');
+  if (rfill) rfill.style.width = Math.min(100,Math.max(3,grand/TARGET*100))+'%';
   setEl('range-pct',
-    total >= TARGET_LOW && total <= TARGET_HIGH ? 'Within target range ✓' :
-    total < TARGET_LOW  ? 'Below $4.2M target' : 'Above target — great! ✓');
+    grand >= TARGET ? 'At or above $27.1M base ✓' :
+    '~'+Math.round(grand/TARGET*100)+'% of $27.1M base');
 
   // Bar chart
-  barChart.data.datasets[0].data = [authRev, c1Net, c2Net];
+  barChart.data.datasets[0].data = [a1_rev, a2_rev, b1_rev, b21_net, b22_net, c1_rev, c2p1_rev+c2p2_rev, c3_sports+c3_gear];
   barChart.update();
 
-  // Scenario chart "You" column
-  scenChart.data.datasets[0].data[3] = authRev;
-  scenChart.data.datasets[1].data[3] = c1Net;
-  scenChart.data.datasets[2].data[3] = c2Net;
+  // Scenario "You" column
+  scenChart.data.datasets[0].data[3] = a1_rev+a2_rev;
+  scenChart.data.datasets[1].data[3] = b1_rev+b21_net+b22_net;
+  scenChart.data.datasets[2].data[3] = c_total;
   scenChart.update();
 
   // Contribution bars
-  const maxVal = Math.max(authRev, c1Net, c2Net, 1);
-  [['b',authRev],['c1',c1Net],['c2',c2Net]].forEach(([id,val]) => {
-    const bar = document.getElementById('cb-'+id);
-    const lbl = document.getElementById('cv-'+id);
-    if (bar) bar.style.width = Math.max(0, val / maxVal * 100) + '%';
-    if (lbl) lbl.textContent = fmtBig(val) + (total > 0 ? ' (' + (val/total*100).toFixed(0) + '%)' : '');
+  const vals = [a1_rev, a2_rev, b1_rev, b21_net, b22_net, c1_rev, c2p1_rev+c2p2_rev, c3_sports+c3_gear];
+  const ids =  ['a1','a2','b1','b21','b22','c1','c2','c3'];
+  const maxV = Math.max(...vals, 1);
+  ids.forEach((id,i) => {
+    const v = vals[i];
+    const bar = $('cb-'+id); if(bar) bar.style.width = Math.max(0,v/maxV*100)+'%';
+    const lbl = $('cv-'+id); if(lbl) lbl.textContent = fmtBig(v)+(grand>0?' ('+Math.round(v/grand*100)+'%)':'');
   });
 }
 
-// ── Toggle card ──────────────────────────────────────────────────────────────
-function toggleCard(id) { document.getElementById(id).classList.toggle('collapsed'); }
-
-// ── Init ─────────────────────────────────────────────────────────────────────
-['impressions','ctr','base_visitors','auth_rate','visits','cpm','c1_rev','c1_cost','c2_rev','c2_cost']
-  .forEach(id => { const s = document.getElementById('s_'+id); if (s) updateDisplay(id, s.value); });
-calc();
+// ── Init ──────────────────────────────────────────────────────────────────────
+applyScenario('base');
 </script>
 </body>
 </html>
