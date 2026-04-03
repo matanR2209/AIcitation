@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SI Revenue Model — Interactive Growth Engine</title>
+<title>SI Revenue Model - Interactive Growth Engine</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -72,10 +72,22 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
 .sub-c{background:rgba(13,115,119,.07);border-color:rgba(13,115,119,.2)}.sub-c .sub-badge{background:var(--teal)}
 .sub-d{background:rgba(91,33,182,.07);border-color:rgba(91,33,182,.2)}.sub-d .sub-badge{background:var(--purple)}
 
-.sub-a .sub-head{background:rgba(28,44,107,.08)}
+.sub-a .sub-head{background:rgba(0,0,0,.15)}
 .sub-b .sub-head{background:rgba(180,83,9,.08)}
 .sub-c .sub-head{background:rgba(13,115,119,.07)}
 .sub-d .sub-head{background:rgba(91,33,182,.07)}
+
+/* ── Section A: white text on navy background ────────────────────────────── */
+.sub-a .sub-head .sub-title,.sub-a .sub-head .chevron{color:#fff}
+.sub-a .s-label{color:rgba(255,255,255,.9)}
+.sub-a .s-range{color:rgba(255,255,255,.55)}
+.sub-a .static-row{color:rgba(255,255,255,.85);border-bottom-color:rgba(255,255,255,.15)}
+.sub-a .static-row .sr-val{color:#fff}
+.sub-a .srow input[type=range]{background:rgba(255,255,255,.25)}
+.sub-a .computed-row{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff}
+.sub-a .computed-row .cr-val{color:#fff}
+.sub-a .computed-row .cr-formula{color:rgba(255,255,255,.65)}
+.sub-a .out-pill .op-lbl{color:#5a6a8a}
 
 .sub-a .sub-total{background:var(--a-light);color:var(--navy)}
 .sub-b .sub-total{background:var(--b-light);color:var(--amber)}
@@ -221,30 +233,36 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
       <div class="sub-head" onclick="toggleSub('sub-a1',event)">
         <input type="checkbox" class="sub-chk" id="chk-a1" checked onclick="toggleSub2('a1',event)">
         <span class="sub-badge">A1</span>
-        <span class="sub-title">AI Citation Engine — Traffic from AI Search</span>
+        <span class="sub-title">AI Citation Engine: Traffic from AI Search</span>
         <span class="sub-total" id="sst-a1">$0</span>
-        <span class="chevron" style="color:#555">▾</span>
+        <span class="chevron">▾</span>
       </div>
       <div class="sub-body" id="body-a1">
 
-        <div class="static-row">
-          <span>AI sports queries / month (fixed benchmark
+        <div class="static-row" style="background:rgba(28,44,107,.12);border-radius:5px;padding:5px 8px;color:#fff;border-bottom:none;margin-bottom:8px">
+          <span style="color:#fff">AI sports queries / month (fixed benchmark
             <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Semrush Jul 2025: ~400M AI sports queries/month. Fixed as external market figure SI cannot control. Sets the ceiling for all A1 traffic models.</div></span>)
           </span>
-          <span class="sr-val">400M</span>
-        </div>
-
-        <div class="static-row">
-          <span>CTR when cited (fixed)
-            <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 14: 'CITATION-TO-CLICK RATE (CTR): 1.5%' — fixed benchmark. Industry-standard rate across all companies. Stored as 0.015 decimal.</div></span>
-          </span>
-          <span class="sr-val">1.5%</span>
+          <span class="sr-val" style="color:#fff">400M</span>
         </div>
 
         <div class="srow">
           <div class="srow-top">
             <div class="s-label-wrap">
-              <span class="s-label">SI citation rate (per 1,000 AI queries)</span>
+              <span class="s-label">CTR when cited <span style="font-size:.68rem;color:#94a3b8;font-weight:400">(benchmark: 1.5%, adjustable)</span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 14: 'CITATION-TO-CLICK RATE (CTR): 1.5%' - industry benchmark across all companies. Adjust if SI achieves above/below average prominence in AI results.</div></span>
+              </span>
+            </div>
+            <span class="s-val" id="dv-ctr_rate">1.5%</span>
+          </div>
+          <input type="range" id="s_ctr_rate" min="0.1" max="5" step="0.1" value="1.5" oninput="upd('ctr_rate',this.value);calc()">
+          <div class="s-range"><span>0.1%</span><span>5%</span></div>
+        </div>
+
+        <div class="srow">
+          <div class="srow-top">
+            <div class="s-label-wrap">
+              <span class="s-label">SI citation rate (per 1,000 AI queries) <span style="font-size:.68rem;color:#94a3b8;font-weight:400">(benchmark: 10–30)</span></span>
               <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 14 bar chart shows 10/20/30 per 1,000 queries. Core lever: 400M × rate/1000 × 1.5% = new SI visits. Currently SI gets ~0. Low=conservative entry, High=full optimisation.</div></span>
             </div>
             <span class="s-val" id="dv-citation_rate">20 / 1k</span>
@@ -268,14 +286,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
         <div class="computed-row">
           <div>
             <div class="cr-label">New visitors / mo (computed)</div>
-            <div class="cr-formula">400M × citation_rate/1000 × 1.5%</div>
+            <div class="cr-formula">400M × citation_rate/1000 × CTR%</div>
           </div>
-          <div class="cr-val" id="out-a1-vis">—</div>
+          <div class="cr-val" id="out-a1-vis">-</div>
         </div>
 
         <div class="outputs">
-          <div class="out-pill"><div class="op-lbl">New visitors / mo</div><div class="op-val" id="op-a1-vis">—</div></div>
-          <div class="out-pill"><div class="op-lbl">A1 Revenue / yr</div><div class="op-val" id="op-a1-rev">—</div></div>
+          <div class="out-pill"><div class="op-lbl">New visitors / mo</div><div class="op-val" id="op-a1-vis">-</div></div>
+          <div class="out-pill"><div class="op-lbl">A1 Revenue / yr</div><div class="op-val" id="op-a1-rev">-</div></div>
         </div>
       </div>
     </div><!-- /sub-a1 -->
@@ -287,9 +305,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
       <div class="sub-head" onclick="toggleSub('sub-a2',event)">
         <input type="checkbox" class="sub-chk" id="chk-a2" checked onclick="toggleSub2('a2',event)">
         <span class="sub-badge">A2</span>
-        <span class="sub-title">Social Distribution — YouTube · TikTok · Instagram · X</span>
+        <span class="sub-title">Social Distribution: YouTube · TikTok · Instagram · X</span>
         <span class="sub-total" id="sst-a2">$0</span>
-        <span class="chevron" style="color:#555">▾</span>
+        <span class="chevron">▾</span>
       </div>
       <div class="sub-body" id="body-a2">
 
@@ -298,7 +316,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
           <div class="srow-top">
             <div class="s-label-wrap">
               <span class="s-label">Social referral CTR to SI.com</span>
-              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Industry estimate: 0.5–1.5% typical for sports media link-in-bio / swipe-ups. CRITICAL: social growth doesn't just earn platform revenue — it drives SI.com traffic feeding B1 auth pool.</div></span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Industry estimate: 0.5–1.5% typical for sports media link-in-bio / swipe-ups. CRITICAL: social growth doesn't just earn platform revenue, it drives SI.com traffic feeding B1 auth pool.</div></span>
             </div>
             <span class="s-val" id="dv-social_ctr">1.0%</span>
           </div>
@@ -316,7 +334,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="srow-top">
               <div class="s-label-wrap">
                 <span class="s-label">Monthly views (M)</span>
-                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: Current 613K subs / ~1.5M views → Target 1.5M subs / ~8M views/mo. YouTube is SI's strongest long-form platform — views drive both RPM revenue and audience growth.</div></span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 19: Current 613K subs / ~1.5M views → Target 1.5M subs / ~8M views/mo. YouTube is SI's strongest long-form platform: views drive both RPM revenue and audience growth.</div></span>
               </div>
               <span class="s-val" id="dv-yt_views">4.0M</span>
             </div>
@@ -357,7 +375,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="s-range"><span>$1K</span><span>$20K</span></div>
           </div>
           <div class="outputs sec-a">
-            <div class="out-pill"><div class="op-lbl">YouTube / yr</div><div class="op-val" id="op-yt">—</div></div>
+            <div class="out-pill"><div class="op-lbl">YouTube / yr</div><div class="op-val" id="op-yt">-</div></div>
           </div>
         </div>
 
@@ -411,7 +429,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="s-range"><span>$500</span><span>$15K</span></div>
           </div>
           <div class="outputs sec-a">
-            <div class="out-pill"><div class="op-lbl">TikTok / yr</div><div class="op-val" id="op-tt">—</div></div>
+            <div class="out-pill"><div class="op-lbl">TikTok / yr</div><div class="op-val" id="op-tt">-</div></div>
           </div>
         </div>
 
@@ -443,7 +461,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="s-range"><span>$1K</span><span>$20K</span></div>
           </div>
           <div class="outputs sec-a">
-            <div class="out-pill"><div class="op-lbl">Instagram / yr</div><div class="op-val" id="op-ig">—</div></div>
+            <div class="out-pill"><div class="op-lbl">Instagram / yr</div><div class="op-val" id="op-ig">-</div></div>
           </div>
         </div>
 
@@ -497,13 +515,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="s-range"><span>$0</span><span>$8K</span></div>
           </div>
           <div class="outputs sec-a">
-            <div class="out-pill"><div class="op-lbl">X/Twitter / yr</div><div class="op-val" id="op-tw">—</div></div>
+            <div class="out-pill"><div class="op-lbl">X/Twitter / yr</div><div class="op-val" id="op-tw">-</div></div>
           </div>
         </div>
 
         <div class="outputs sec-a" style="margin-top:12px;padding-top:10px;border-top:1px dashed #CCC">
-          <div class="out-pill"><div class="op-lbl">Social referral visitors / mo</div><div class="op-val" id="op-a2-ref">—</div></div>
-          <div class="out-pill"><div class="op-lbl">A2 Total Revenue / yr</div><div class="op-val" id="op-a2-rev">—</div></div>
+          <div class="out-pill"><div class="op-lbl">Social referral visitors / mo</div><div class="op-val" id="op-a2-ref">-</div></div>
+          <div class="out-pill"><div class="op-lbl">A2 Total Revenue / yr</div><div class="op-val" id="op-a2-rev">-</div></div>
         </div>
 
       </div>
@@ -512,7 +530,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
   </div>
 </div><!-- /sec-a -->
 
-<div class="connector"><span class="arr">↓</span>A feeds B — traffic enters the authentication funnel</div>
+<div class="connector"><span class="arr">↓</span>A feeds B: traffic enters the authentication funnel</div>
 
 <!-- ████ SECTION B ████ -->
 <div class="sec-card sec-b" id="card-b">
@@ -533,7 +551,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
       <div class="sub-head" onclick="toggleSub('sub-b1',event)">
         <input type="checkbox" class="sub-chk" id="chk-b1" checked onclick="toggleSub2('b1',event)">
         <span class="sub-badge" style="background:var(--amber)">B1</span>
-        <span class="sub-title">Auth Engine — Converting Visitors to Owned Audience</span>
+        <span class="sub-title">Auth Engine: Converting Visitors to Owned Audience</span>
         <span class="sub-total" style="background:var(--b-light);color:var(--amber)" id="sst-b1">$0</span>
         <span class="chevron" style="color:#555">▾</span>
       </div>
@@ -554,9 +572,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
         <div class="computed-row">
           <div>
             <div class="cr-label">Total visitors / mo (base + A1 + A2 referral)</div>
-            <div class="cr-formula">Auto-linked from A1 &amp; A2 — toggle above to change</div>
+            <div class="cr-formula">Auto-linked from A1 &amp; A2- toggle above to change</div>
           </div>
-          <div class="cr-val" id="out-b1-vis">—</div>
+          <div class="cr-val" id="out-b1-vis">-</div>
         </div>
 
         <div class="srow">
@@ -597,16 +615,16 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
 
         <div class="computed-row">
           <div>
-            <div class="cr-label">CPM uplift (auth − anon) — auto-computed</div>
+            <div class="cr-label">CPM uplift (auth − anon)- auto-computed</div>
           </div>
-          <div class="cr-val" id="out-b1-uplift">—</div>
+          <div class="cr-val" id="out-b1-uplift">-</div>
         </div>
 
         <div class="note">Avg 4 visits/user/mo fixed. Formula: auth_users × 4 visits × CPM_uplift ÷ 1,000 × 12</div>
 
         <div class="outputs sec-b">
-          <div class="out-pill"><div class="op-lbl">Authenticated users</div><div class="op-val" id="op-b1-auth">—</div></div>
-          <div class="out-pill"><div class="op-lbl">B1 Auth CPM Rev / yr</div><div class="op-val" id="op-b1-rev">—</div></div>
+          <div class="out-pill"><div class="op-lbl">Authenticated users</div><div class="op-val" id="op-b1-auth">-</div></div>
+          <div class="out-pill"><div class="op-lbl">B1 Auth CPM Rev / yr</div><div class="op-val" id="op-b1-rev">-</div></div>
         </div>
       </div>
     </div><!-- /sub-b1 -->
@@ -616,7 +634,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
       <div class="sub-head" onclick="toggleSub('sub-b21',event)">
         <input type="checkbox" class="sub-chk" id="chk-b21" checked onclick="toggleSub2('b21',event)">
         <span class="sub-badge" style="background:var(--amber)">B2.1</span>
-        <span class="sub-title">AI Audio Personalization — ElevenLabs</span>
+        <span class="sub-title">AI Audio Personalization - ElevenLabs</span>
         <span class="sub-total" style="background:var(--b-light);color:var(--amber)" id="sst-b21">$0</span>
         <span class="chevron" style="color:#555">▾</span>
       </div>
@@ -624,7 +642,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
         <div class="srow">
           <div class="srow-top">
             <div class="s-label-wrap">
-              <span class="s-label">Gross revenue — AI Audio</span>
+              <span class="s-label">Gross revenue - AI Audio</span>
               <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 27/28: '$0.6–0.9M/yr CPM uplift + podcast ad rev'. Slide 27: '$1.5–3M/yr full potential'. CPM uplift from personalized audio content + podcast advertising.</div></span>
             </div>
             <span class="s-val" id="dv-b21_gross">$750K</span>
@@ -635,8 +653,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
         <div class="srow">
           <div class="srow-top">
             <div class="s-label-wrap">
-              <span class="s-label">Implementation cost — ElevenLabs API</span>
-              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 27/28: '~$35K/yr API cost at SI's scale'. ElevenLabs enterprise publisher tier pricing (publisher license). API cost negligible vs revenue at scale — ~97% margin.</div></span>
+              <span class="s-label">Implementation cost - ElevenLabs API</span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 27/28: '~$35K/yr API cost at SI's scale'. ElevenLabs enterprise publisher tier pricing (publisher license). API cost negligible vs revenue at scale - ~97% margin.</div></span>
             </div>
             <span class="s-val" id="dv-b21_cost">$35K</span>
           </div>
@@ -648,10 +666,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="cr-label">Net margin (auto-computed)</div>
             <div class="cr-formula">(Gross − Cost) ÷ Gross</div>
           </div>
-          <div class="cr-val" id="out-b21-margin">—</div>
+          <div class="cr-val" id="out-b21-margin">-</div>
         </div>
         <div class="outputs sec-b">
-          <div class="out-pill"><div class="op-lbl">B2.1 Net Revenue / yr</div><div class="op-val" id="op-b21-net">—</div></div>
+          <div class="out-pill"><div class="op-lbl">B2.1 Net Revenue / yr</div><div class="op-val" id="op-b21-net">-</div></div>
         </div>
       </div>
     </div><!-- /sub-b21 -->
@@ -661,7 +679,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
       <div class="sub-head" onclick="toggleSub('sub-b22',event)">
         <input type="checkbox" class="sub-chk" id="chk-b22" checked onclick="toggleSub2('b22',event)">
         <span class="sub-badge" style="background:var(--amber)">B2.2</span>
-        <span class="sub-title">AI Visual + Live Coverage — WSC Sports / Magnifi</span>
+        <span class="sub-title">AI Visual + Live Coverage - WSC Sports / Magnifi</span>
         <span class="sub-total" style="background:var(--b-light);color:var(--amber)" id="sst-b22">$0</span>
         <span class="chevron" style="color:#555">▾</span>
       </div>
@@ -669,7 +687,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
         <div class="srow">
           <div class="srow-top">
             <div class="s-label-wrap">
-              <span class="s-label">Gross revenue — AI Visual + Live</span>
+              <span class="s-label">Gross revenue - AI Visual + Live</span>
               <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 27/28: '$2–4M/yr video CPM + session lift'. WSC Sports / LaLiga Case Study 2024. AI highlights, IBM Watson-style live hub. Video CPM uplift + session length lift.</div></span>
             </div>
             <span class="s-val" id="dv-b22_gross">$3.0M</span>
@@ -680,7 +698,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
         <div class="srow">
           <div class="srow-top">
             <div class="s-label-wrap">
-              <span class="s-label">Implementation cost — platform / licensing</span>
+              <span class="s-label">Implementation cost - platform / licensing</span>
               <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 28: 'Magnifi near-zero marginal'. WSC Sports licensing + integration ~$500K/yr. Auto-computed: '~85% margin (Magnifi near-zero marginal)'.</div></span>
             </div>
             <span class="s-val" id="dv-b22_cost">$500K</span>
@@ -693,10 +711,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="cr-label">Net margin (auto-computed)</div>
             <div class="cr-formula">(Gross − Cost) ÷ Gross</div>
           </div>
-          <div class="cr-val" id="out-b22-margin">—</div>
+          <div class="cr-val" id="out-b22-margin">-</div>
         </div>
         <div class="outputs sec-b">
-          <div class="out-pill"><div class="op-lbl">B2.2 Net Revenue / yr</div><div class="op-val" id="op-b22-net">—</div></div>
+          <div class="out-pill"><div class="op-lbl">B2.2 Net Revenue / yr</div><div class="op-val" id="op-b22-net">-</div></div>
         </div>
       </div>
     </div><!-- /sub-b22 -->
@@ -712,7 +730,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
     <input type="checkbox" class="sec-chk" id="chk-c" checked onclick="toggleSection('c',event)">
     <div class="badge" style="font-size:.7rem">C</div>
     <div class="sec-label">
-      <strong>Partnerships — AI Licensing · Paywall · Commerce</strong>
+      <strong>Partnerships - AI Licensing · Paywall · Commerce</strong>
       <span>C1 Licensing · C2 Paywall · C3 Commerce Affiliate</span>
     </div>
     <div class="sec-total" id="st-c">$0</div>
@@ -725,14 +743,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
       <div class="sub-head" onclick="toggleSub('sub-c1',event)">
         <input type="checkbox" class="sub-chk" id="chk-c1" checked onclick="toggleSub2('c1',event)">
         <span class="sub-badge">C1</span>
-        <span class="sub-title">AI Licensing — SI + FanSided + Sports Reference Bundle</span>
+        <span class="sub-title">AI Licensing - SI + FanSided + Sports Reference Bundle</span>
         <span class="sub-total" id="sst-c1">$0</span>
         <span class="chevron" style="color:#555">▾</span>
       </div>
       <div class="sub-body" id="body-c1">
         <div class="static-row">
           <span>Licensable articles in bundle (fixed)
-            <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 31: '1.53M SI articles + 2.42M FanSided + Sports Reference historical stats'. Fixed content pool — represents the IP bundle value.</div></span>
+            <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 31: '1.53M SI articles + 2.42M FanSided + Sports Reference historical stats'. Fixed content pool - represents the IP bundle value.</div></span>
           </span>
           <span class="sr-val">3.95M articles</span>
         </div>
@@ -740,7 +758,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
           <div class="srow-top">
             <div class="s-label-wrap">
               <span class="s-label">Gross licensing pool (total deal value)</span>
-              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 34: 'Revenue Target: Up to $8M'. Slide 31: market proof — premium articles from publisher co-ops. 'Up to $8M annual revenue potential'.</div></span>
+              <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 34: 'Revenue Target: Up to $8M'. Slide 31: market proof - premium articles from publisher co-ops. 'Up to $8M annual revenue potential'.</div></span>
             </div>
             <span class="s-val" id="dv-licensing_pool">$8.0M</span>
           </div>
@@ -759,7 +777,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
           <div class="s-range"><span>10%</span><span>80%</span></div>
         </div>
         <div class="outputs sec-c">
-          <div class="out-pill"><div class="op-lbl">C1 AI Licensing / yr</div><div class="op-val" id="op-c1">—</div></div>
+          <div class="out-pill"><div class="op-lbl">C1 AI Licensing / yr</div><div class="op-val" id="op-c1">-</div></div>
         </div>
       </div>
     </div><!-- /sub-c1 -->
@@ -769,14 +787,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
       <div class="sub-head" onclick="toggleSub('sub-c2',event)">
         <input type="checkbox" class="sub-chk" id="chk-c2" checked onclick="toggleSub2('c2',event)">
         <span class="sub-badge">C2</span>
-        <span class="sub-title">Partnership Paywall — Bundle Distribution + Direct SI+</span>
+        <span class="sub-title">Partnership Paywall - Bundle Distribution + Direct SI+</span>
         <span class="sub-total" id="sst-c2">$0</span>
         <span class="chevron" style="color:#555">▾</span>
       </div>
       <div class="sub-body" id="body-c2">
 
         <div class="plat-divider">
-          <input type="checkbox" class="sub-chk" id="chk-c2p1" checked onclick="togglePlatform('c2p1',event)"> Phase 1 — Bundle Distribution (Apple News+ / Condé Nast)
+          <input type="checkbox" class="sub-chk" id="chk-c2p1" checked onclick="togglePlatform('c2p1',event)"> Phase 1 - Bundle Distribution (Apple News+ / Condé Nast)
         </div>
         <div id="body-c2p1">
           <div class="srow">
@@ -794,7 +812,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="srow-top">
               <div class="s-label-wrap">
                 <span class="s-label">Bundle subscriber price ($/reader/mo)</span>
-                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 32: Phase 1 rev-share — 40–60% of $4–8/mo bundle price attributable to SI content. Apple News+ / Condé Nast bundle effective value per subscriber.</div></span>
+                <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 32: Phase 1 rev-share - 40–60% of $4–8/mo bundle price attributable to SI content. Apple News+ / Condé Nast bundle effective value per subscriber.</div></span>
               </div>
               <span class="s-val" id="dv-c2_price">$5.00</span>
             </div>
@@ -813,12 +831,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="s-range"><span>10%</span><span>80%</span></div>
           </div>
           <div class="outputs sec-c">
-            <div class="out-pill"><div class="op-lbl">Phase 1 Bundle / yr</div><div class="op-val" id="op-c2p1">—</div></div>
+            <div class="out-pill"><div class="op-lbl">Phase 1 Bundle / yr</div><div class="op-val" id="op-c2p1">-</div></div>
           </div>
         </div>
 
         <div class="plat-divider">
-          <input type="checkbox" class="sub-chk" id="chk-c2p2" checked onclick="togglePlatform('c2p2',event)"> Phase 2 — Direct Paywall (SI+ $6–$10/mo, 100% margin)
+          <input type="checkbox" class="sub-chk" id="chk-c2p2" checked onclick="togglePlatform('c2p2',event)"> Phase 2 - Direct Paywall (SI+ $6–$10/mo, 100% margin)
         </div>
         <div id="body-c2p2">
           <div class="srow">
@@ -848,10 +866,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
               <div class="cr-label">Direct subscribers (computed)</div>
               <div class="cr-formula">bundle_readers × conversion rate</div>
             </div>
-            <div class="cr-val" id="out-c2-subs">—</div>
+            <div class="cr-val" id="out-c2-subs">-</div>
           </div>
           <div class="outputs sec-c">
-            <div class="out-pill"><div class="op-lbl">Phase 2 Direct ARR / yr</div><div class="op-val" id="op-c2p2">—</div></div>
+            <div class="out-pill"><div class="op-lbl">Phase 2 Direct ARR / yr</div><div class="op-val" id="op-c2p2">-</div></div>
           </div>
         </div>
 
@@ -863,7 +881,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
       <div class="sub-head" onclick="toggleSub('sub-c3',event)">
         <input type="checkbox" class="sub-chk" id="chk-c3" checked onclick="toggleSub2('c3',event)">
         <span class="sub-badge">C3</span>
-        <span class="sub-title">Commerce Affiliate — Sportsbook + Gear/Commerce</span>
+        <span class="sub-title">Commerce Affiliate - Sportsbook + Gear/Commerce</span>
         <span class="sub-total" id="sst-c3">$0</span>
         <span class="chevron" style="color:#555">▾</span>
       </div>
@@ -877,11 +895,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
         </div>
 
         <div class="plat-divider">
-          <input type="checkbox" class="sub-chk" id="chk-sports" checked onclick="togglePlatform('sports',event)"> Sportsbook Engine — DraftKings · BetMGM · Polymarket
+          <input type="checkbox" class="sub-chk" id="chk-sports" checked onclick="togglePlatform('sports',event)"> Sportsbook Engine - DraftKings · BetMGM · Polymarket
         </div>
         <div id="body-sports">
           <div class="static-row">
-            <span>Bettor overlap (fixed — FanSided declared data)
+            <span>Bettor overlap (fixed - FanSided declared data)
               <span class="tip-wrap"><button class="info-btn" onclick="toggleTip(this)">i</button><div class="tooltip"><strong>Source</strong>Slide 33: '25% bettor overlap'. FanSided declared fan data pre-qualifies betting audience. Fixed benchmark.</div></span>
             </span>
             <span class="sr-val">25% → 22.5M qualifying</span>
@@ -910,12 +928,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="s-range"><span>$10</span><span>$150 / acquisition</span></div>
           </div>
           <div class="outputs sec-c">
-            <div class="out-pill"><div class="op-lbl">Sportsbook / yr</div><div class="op-val" id="op-sports">—</div></div>
+            <div class="out-pill"><div class="op-lbl">Sportsbook / yr</div><div class="op-val" id="op-sports">-</div></div>
           </div>
         </div>
 
         <div class="plat-divider">
-          <input type="checkbox" class="sub-chk" id="chk-gear" checked onclick="togglePlatform('gear',event)"> Gear / Commerce — Dick's · Nike · REI · Fanatics
+          <input type="checkbox" class="sub-chk" id="chk-gear" checked onclick="togglePlatform('gear',event)"> Gear / Commerce - Dick's · Nike · REI · Fanatics
         </div>
         <div id="body-gear">
           <div class="srow">
@@ -947,7 +965,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
             <div class="s-range"><span>1%</span><span>20%</span></div>
           </div>
           <div class="outputs sec-c">
-            <div class="out-pill"><div class="op-lbl">Gear/Commerce / yr</div><div class="op-val" id="op-gear">—</div></div>
+            <div class="out-pill"><div class="op-lbl">Gear/Commerce / yr</div><div class="op-val" id="op-gear">-</div></div>
           </div>
         </div>
 
@@ -965,18 +983,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
   <div class="total-box">
     <div class="tb-left">
       <div class="tb-label">Total Year 1 Revenue</div>
-      <div class="tb-val" id="big-total">—</div>
+      <div class="tb-val" id="big-total">-</div>
       <div style="color:#888;font-size:.68rem;margin-top:2px">All enabled streams combined</div>
-    </div>
-    <div class="tb-right">
-      <div class="tb-sub">vs. $27.1M base target</div>
-      <div class="range-bar"><div class="rb-fill" id="range-fill" style="width:5%"></div></div>
-      <div style="color:#666;font-size:.66rem;margin-top:3px;text-align:right" id="range-pct">—</div>
     </div>
   </div>
 
   <div class="chart-card" style="flex:1;min-height:200px;display:flex;flex-direction:column">
-    <h3>Revenue Breakdown — Live</h3>
+    <h3>Revenue Breakdown - Live</h3>
     <div style="flex:1;position:relative;min-height:0">
       <canvas id="barChart"></canvas>
     </div>
@@ -985,14 +998,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--da
   <div class="chart-card">
     <h3>Contribution to Total</h3>
     <div class="contrib-list">
-      <div class="cr-row"><span class="crl">A1 · AI Citation</span><div class="crb-wrap"><div class="crb" id="cb-a1" style="background:#1C2C6B;width:0%"></div></div><span class="crv" id="cv-a1" style="color:#1C2C6B">—</span></div>
-      <div class="cr-row"><span class="crl">A2 · Social</span><div class="crb-wrap"><div class="crb" id="cb-a2" style="background:#2563EB;width:0%"></div></div><span class="crv" id="cv-a2" style="color:#2563EB">—</span></div>
-      <div class="cr-row"><span class="crl">B1 · Auth CPM</span><div class="crb-wrap"><div class="crb" id="cb-b1" style="background:#B45309;width:0%"></div></div><span class="crv" id="cv-b1" style="color:#B45309">—</span></div>
-      <div class="cr-row"><span class="crl">B2.1 · AI Audio</span><div class="crb-wrap"><div class="crb" id="cb-b21" style="background:#D97706;width:0%"></div></div><span class="crv" id="cv-b21" style="color:#D97706">—</span></div>
-      <div class="cr-row"><span class="crl">B2.2 · AI Visual</span><div class="crb-wrap"><div class="crb" id="cb-b22" style="background:#F59E0B;width:0%"></div></div><span class="crv" id="cv-b22" style="color:#F59E0B">—</span></div>
-      <div class="cr-row"><span class="crl">C1 · AI Licensing</span><div class="crb-wrap"><div class="crb" id="cb-c1" style="background:#0D7377;width:0%"></div></div><span class="crv" id="cv-c1" style="color:#0D7377">—</span></div>
-      <div class="cr-row"><span class="crl">C2 · Paywall</span><div class="crb-wrap"><div class="crb" id="cb-c2" style="background:#0E9EA6;width:0%"></div></div><span class="crv" id="cv-c2" style="color:#0E9EA6">—</span></div>
-      <div class="cr-row"><span class="crl">C3 · Commerce</span><div class="crb-wrap"><div class="crb" id="cb-c3" style="background:#5B21B6;width:0%"></div></div><span class="crv" id="cv-c3" style="color:#5B21B6">—</span></div>
+      <div class="cr-row"><span class="crl">A1 · AI Citation</span><div class="crb-wrap"><div class="crb" id="cb-a1" style="background:#1C2C6B;width:0%"></div></div><span class="crv" id="cv-a1" style="color:#1C2C6B">-</span></div>
+      <div class="cr-row"><span class="crl">A2 · Social</span><div class="crb-wrap"><div class="crb" id="cb-a2" style="background:#2563EB;width:0%"></div></div><span class="crv" id="cv-a2" style="color:#2563EB">-</span></div>
+      <div class="cr-row"><span class="crl">B1 · Auth CPM</span><div class="crb-wrap"><div class="crb" id="cb-b1" style="background:#B45309;width:0%"></div></div><span class="crv" id="cv-b1" style="color:#B45309">-</span></div>
+      <div class="cr-row"><span class="crl">B2.1 · AI Audio</span><div class="crb-wrap"><div class="crb" id="cb-b21" style="background:#D97706;width:0%"></div></div><span class="crv" id="cv-b21" style="color:#D97706">-</span></div>
+      <div class="cr-row"><span class="crl">B2.2 · AI Visual</span><div class="crb-wrap"><div class="crb" id="cb-b22" style="background:#F59E0B;width:0%"></div></div><span class="crv" id="cv-b22" style="color:#F59E0B">-</span></div>
+      <div class="cr-row"><span class="crl">C1 · AI Licensing</span><div class="crb-wrap"><div class="crb" id="cb-c1" style="background:#0D7377;width:0%"></div></div><span class="crv" id="cv-c1" style="color:#0D7377">-</span></div>
+      <div class="cr-row"><span class="crl">C2 · Paywall</span><div class="crb-wrap"><div class="crb" id="cb-c2" style="background:#0E9EA6;width:0%"></div></div><span class="crv" id="cv-c2" style="color:#0E9EA6">-</span></div>
+      <div class="cr-row"><span class="crl">C3 · Commerce</span><div class="crb-wrap"><div class="crb" id="cb-c3" style="background:#5B21B6;width:0%"></div></div><span class="crv" id="cv-c3" style="color:#5B21B6">-</span></div>
     </div>
   </div>
 
@@ -1089,6 +1102,7 @@ function fmtNum(n) {
 
 // ── Display formatters ────────────────────────────────────────────────────────
 const FMT = {
+  ctr_rate:      v => parseFloat(v).toFixed(1)+'%',
   citation_rate: v => Math.round(v)+' / 1k',
   site_rpm:      v => '$'+parseFloat(v).toFixed(0),
   social_ctr:    v => parseFloat(v).toFixed(1)+'%',
@@ -1134,7 +1148,7 @@ function upd(id, v) {
 // ── Scenario presets ──────────────────────────────────────────────────────────
 const SC = {
   low: {
-    citation_rate:10, site_rpm:15, social_ctr:0.5,
+    ctr_rate:1.5, citation_rate:10, site_rpm:15, social_ctr:0.5,
     yt_views:1.5, yt_rpm:3, yt_deals:1, yt_deal_val:4000,
     tt_views:10, tt_rpm:0.4, tt_deals:2, tt_deal_val:3500,
     ig_posts:3, ig_val:4000,
@@ -1148,7 +1162,7 @@ const SC = {
     gear_conv:0.08, gear_commission:5,
   },
   base: {
-    citation_rate:20, site_rpm:20, social_ctr:1,
+    ctr_rate:1.5, citation_rate:20, site_rpm:20, social_ctr:1,
     yt_views:4, yt_rpm:5, yt_deals:2, yt_deal_val:6000,
     tt_views:20, tt_rpm:0.7, tt_deals:4, tt_deal_val:5000,
     ig_posts:5, ig_val:8000,
@@ -1162,7 +1176,7 @@ const SC = {
     gear_conv:0.1, gear_commission:7,
   },
   high: {
-    citation_rate:30, site_rpm:30, social_ctr:1.5,
+    ctr_rate:1.5, citation_rate:30, site_rpm:30, social_ctr:1.5,
     yt_views:8, yt_rpm:7, yt_deals:4, yt_deal_val:8000,
     tt_views:30, tt_rpm:1.0, tt_deals:6, tt_deal_val:7000,
     ig_posts:6, ig_val:12000,
@@ -1209,7 +1223,7 @@ const barChart = new Chart(barCtx, {
 
 function calcScen(sc) {
   const d = SC[sc];
-  const a1v = 400e6*(d.citation_rate/1000)*0.015;
+  const a1v = 400e6*(d.citation_rate/1000)*((d.ctr_rate||1.5)/100);
   const a1 = a1v*d.site_rpm/1000*12;
   const a2 = ((d.yt_views*1e6*d.yt_rpm/1000+d.yt_deals*d.yt_deal_val)+
                (d.tt_views*1e6*d.tt_rpm/1000+d.tt_deals*d.tt_deal_val)+
@@ -1267,7 +1281,7 @@ function calc() {
   // A1
   let a1_vis = 0, a1_rev = 0;
   if (chk('a1')) {
-    a1_vis = 400e6 * (gv('citation_rate')/1000) * 0.015;
+    a1_vis = 400e6 * (gv('citation_rate')/1000) * (gv('ctr_rate')/100);
     a1_rev = a1_vis * gv('site_rpm')/1000 * 12;
   }
 
@@ -1296,8 +1310,8 @@ function calc() {
     setEl('out-b1-vis', fmtNum(b1_total_vis));
     setEl('out-b1-uplift', '$'+uplift.toFixed(2)+' / 1k');
   } else {
-    setEl('out-b1-vis','—');
-    setEl('out-b1-uplift','—');
+    setEl('out-b1-vis','-');
+    setEl('out-b1-uplift','-');
   }
 
   // B2.1
@@ -1306,7 +1320,7 @@ function calc() {
     b21_net = gv('b21_gross') - gv('b21_cost');
     b21_margin = gv('b21_gross') > 0 ? b21_net/gv('b21_gross')*100 : 0;
   }
-  setEl('out-b21-margin', gv('b21_gross')>0 ? b21_margin.toFixed(1)+'%' : '—');
+  setEl('out-b21-margin', gv('b21_gross')>0 ? b21_margin.toFixed(1)+'%' : '-');
 
   // B2.2
   let b22_net = 0, b22_margin = 0;
@@ -1314,7 +1328,7 @@ function calc() {
     b22_net = gv('b22_gross') - gv('b22_cost');
     b22_margin = gv('b22_gross') > 0 ? b22_net/gv('b22_gross')*100 : 0;
   }
-  setEl('out-b22-margin', gv('b22_gross')>0 ? b22_margin.toFixed(1)+'%' : '—');
+  setEl('out-b22-margin', gv('b22_gross')>0 ? b22_margin.toFixed(1)+'%' : '-');
 
   // C1
   let c1_rev = 0;
@@ -1329,7 +1343,7 @@ function calc() {
       c2p2_rev = c2_subs * gv('c2_direct_price') * 12;
     }
   }
-  setEl('out-c2-subs', c2_subs > 0 ? fmtNum(c2_subs) : '—');
+  setEl('out-c2-subs', c2_subs > 0 ? fmtNum(c2_subs) : '-');
 
   // C3
   let c3_sports = 0, c3_gear = 0;
